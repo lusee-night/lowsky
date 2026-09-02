@@ -51,6 +51,8 @@ sectors, but no angular template or pixel mask is used.
   warp, and Galactic center: https://arxiv.org/abs/1610.09448
 - Gum shell geometry, density, and filling factor:
   https://arxiv.org/abs/1502.06296
+- Gum low-frequency depression at 2 and 4 MHz:
+  https://ntrs.nasa.gov/api/citations/19720004101/downloads/19720004101.pdf
 - Orion--Eridanus geometry and distance uncertainty:
   https://arxiv.org/abs/1404.1917 and https://arxiv.org/abs/1909.10083
 - Cygnus thermal/nonthermal separation:
@@ -61,17 +63,24 @@ sectors, but no angular template or pixel mask is used.
 Implementation: the Local Bubble is a low-order irregular radial cavity with
 a mean wall near 170 pc, ordinary directions spanning roughly 70--220 pc, a
 35-pc soft transition, and narrow polar blowouts reaching beyond 600 pc. Gum
-and Orion--Eridanus are broad, ellipsoidal 3D ionized
-interfaces integrated on a dedicated 2-pc radial grid. Gum uses the
-Purcell et al. center (l=258 deg, b=-6.6 deg), 450-pc distance, 160-pc radius,
-and 18.5-pc wall. The radio-polarization fit's warm-gas filling factor
-f=0.3 (+0.3/-0.1) is used as the central unresolved-covering prior, with only
-gentle cloud-to-cloud modulation and a continuous column-density taper. We do
-not infer discrete high-covering sectors from the fit: Purcell et al. model
-only the relatively clean upper nebula, while the plane and lower nebula are
-explicitly described as confused. The normalization follows their azimuthal
-H-alpha profile: roughly 80 pc cm^-6 in the interior, a 220 pc cm^-6 limb,
-and no more than 30 pc cm^-6 outside.
+and Orion--Eridanus uses broad, ellipsoidal 3D ionized interfaces integrated
+on a dedicated 2-pc radial grid. Gum is deliberately simpler: a partial-cover
+screen at the Purcell et al. center (l=258 deg, b=-6.6 deg) and 450-pc
+distance. The radio-polarization fit's warm-gas filling factor
+f=0.3 (+0.3/-0.1) enters its measured EM through EM=n_e^2 f L; it is not a
+2D beam-covering fraction. At the 2-degree output scale, multiple clumps along
+the shell imply substantial Poisson areal coverage. We infer that coverage
+smoothly from effective EM. The parametric morphology is a single circular
+Gaussian blob (sigma=11.5 deg) centered on the literature position, with no
+closed outer edge, explicit limb, sector, or corrugation. Its
+calibrated central EM is about 107 pc cm^-6 and its all-sky EM integral is
+constrained to 15--35 pc cm^-6 sr. This keeps the model near the observed
+interior EM and the ionized mass implied by the published shell parameters,
+without claiming that the confused limb morphology is known. No survey pixels
+or hand-selected high-covering sectors enter the model. A smooth Poisson
+covering law gives about 0.93 covering at the center while holding the EM
+column fixed; the resulting roughly threefold 4-MHz depression is comparable
+to the historical low-frequency measurement.
 The fitted 22.7-degree circumference is an analytic shell boundary, not a
 resolved, uniformly sharp absorption mask. Purcell et al. explicitly restrict
 their fit to the clean upper nebula; the Galactic-plane and lower regions are

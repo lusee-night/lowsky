@@ -24,6 +24,8 @@ SOURCES = {
     "loop_i_geometry": "https://arxiv.org/abs/0704.0276",
     "radio_loop_spectra": "https://academic.oup.com/mnras/article/376/2/634/1074743",
     "gum_em": "https://academic.oup.com/mnras/article/315/2/241/981357",
+    "gum_geometry": "https://arxiv.org/abs/1502.06296",
+    "gum_low_frequency": "https://ntrs.nasa.gov/api/citations/19720004101/downloads/19720004101.pdf",
     "orion_nested_shells": "https://arxiv.org/abs/1909.10083",
     "cygnus_filaments": "https://arxiv.org/abs/2205.09193",
     "shell_power_projection": "https://arxiv.org/abs/2012.03975",
@@ -65,9 +67,6 @@ def audit(output_dir: Path) -> dict[str, object]:
     regional_em = {name: percentiles(values) for name, values in regions.items()}
     gum_mask = angular_mask(nside, 258.0, -6.6, 23.0)
     gum_interior_mask = angular_mask(nside, 258.0, -6.6, 15.0)
-    gum_limb_mask = angular_mask(nside, 258.0, -6.6, 22.0) & ~angular_mask(
-        nside, 258.0, -6.6, 18.0
-    )
     gum_outer_mask = angular_mask(nside, 258.0, -6.6, 30.0) & ~angular_mask(
         nside, 258.0, -6.6, 25.0
     )
@@ -85,11 +84,11 @@ def audit(output_dir: Path) -> dict[str, object]:
         "interior_effective_em_median_pc_cm6": float(
             np.median(gum_effective_em[gum_interior_mask])
         ),
-        "limb_effective_em_median_pc_cm6": float(
-            np.median(gum_effective_em[gum_limb_mask])
-        ),
         "outside_effective_em_p95_pc_cm6": float(
             np.percentile(gum_effective_em[gum_outer_mask], 95.0)
+        ),
+        "integrated_effective_em_pc_cm6_sr": float(
+            np.sum(gum_effective_em) * hp.nside2pixarea(nside)
         ),
     }
     orion_mask = angular_mask(nside, 202.0, -38.0, 35.0)
@@ -173,24 +172,19 @@ def audit(output_dir: Path) -> dict[str, object]:
     checks = {
         "local_bubble_mean_140_200pc": 140.0 <= bubble["mean"] <= 200.0,
         "local_bubble_has_70_600pc_span": bubble["p05"] <= 120.0 and bubble["p99"] >= 600.0,
-        "gum_covering_matches_clumpy_filling_prior": 0.20
+        "gum_diffuse_covering_is_not_a_binary_mask": 0.35
         <= gum_screen["mean_effective_covering"]
-        <= 0.40,
-        "gum_has_no_invented_high_covering_sector": gum_screen[
-            "interior_covering_p90"
-        ]
-        - gum_screen["interior_covering_p10"]
-        <= 0.12,
-        "gum_diffuse_interior_em_50_130": 50.0
+        <= 0.75,
+        "gum_diffuse_interior_em_35_110": 35.0
         <= gum_screen["interior_effective_em_median_pc_cm6"]
-        <= 130.0,
-        "gum_limb_em_150_300": 150.0
-        <= gum_screen["limb_effective_em_median_pc_cm6"]
-        <= 300.0,
+        <= 110.0,
         "gum_outside_em_below_30": gum_screen[
             "outside_effective_em_p95_pc_cm6"
         ]
         <= 30.0,
+        "gum_integrated_em_15_35_pc_cm6_sr": 15.0
+        <= gum_screen["integrated_effective_em_pc_cm6_sr"]
+        <= 35.0,
         "orion_em_not_uniform_or_saturated": regional_em["orion_eridanus"]["p95"] < 150.0,
         "orion_partial_covering_2_5_percent": 0.02
         <= orion_screen["mean_effective_covering"]

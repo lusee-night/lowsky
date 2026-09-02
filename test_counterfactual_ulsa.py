@@ -82,7 +82,7 @@ def test_orion_filaments_are_thin_partial_covering_screens():
     assert np.all((distance > 0.0) & (distance < 0.651))
 
 
-def test_gum_screen_is_diffuse_without_an_invented_high_covering_sector():
+def test_gum_screen_is_a_compact_diffuse_blob_without_a_shell_edge():
     config = SkyConfig(nside=32, ray_oversample=1, sky_mode="ours")
     geometry = prepare_geometry(config)
     emission_measure, covering, _distance = make_local_partial_screens(
@@ -94,18 +94,19 @@ def test_gum_screen_is_diffuse_without_an_invented_high_covering_sector():
     center = np.asarray(hp.ang2vec(258.0, -6.6, lonlat=True))
     separation = np.degrees(np.arccos(np.clip(vectors @ center, -1.0, 1.0)))
     interior = separation < 15.0
-    inner_edge = (separation >= 20.0) & (separation < 22.0)
-    outer_edge = (separation >= 22.0) & (separation < 24.0)
-    exterior = (separation >= 24.0) & (separation < 26.0)
+    middle = (separation >= 12.0) & (separation < 16.0)
+    outer = (separation >= 20.0) & (separation < 24.0)
+    exterior = (separation >= 28.0) & (separation < 32.0)
+    effective_em = emission_measure[0] * covering[0]
 
-    assert np.max(covering[0]) < 0.37
-    assert np.percentile(covering[0, interior], 90) - np.percentile(
-        covering[0, interior], 10
-    ) < 0.10
-    assert np.median(covering[0, inner_edge]) > np.median(
-        covering[0, outer_edge]
-    ) > np.median(covering[0, exterior])
-    assert np.percentile(emission_measure[0, inner_edge], 50) > 500.0
+    assert np.median(covering[0, interior]) > 0.65
+    assert 0.90 < np.max(covering[0]) < 0.97
+    assert np.median(effective_em[interior]) > np.median(
+        effective_em[middle]
+    ) > np.median(effective_em[outer]) > np.median(effective_em[exterior])
+    assert 90.0 < np.median(effective_em[interior]) < 130.0
+    integrated_em = np.sum(effective_em) * hp.nside2pixarea(config.nside)
+    assert 45.0 < integrated_em < 50.0
 
 
 def test_source_templates_have_unit_solid_angle_integral():

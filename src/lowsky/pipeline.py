@@ -627,8 +627,7 @@ def make_local_partial_screens(
         # Purcell et al. (2015): D~450 pc, R~160 pc and an 18.5-pc wall.
         # Purcell's azimuthal profile is diffuse: EM is about 80 pc cm^-6 in
         # the interior, peaks near 220 at the limb, and falls below 30 outside.
-        # The rate is the in-clump value; the measured f~0.3 is applied below.
-        (258.0, -6.6, 0.45, 0.160, 0.0185, (1.00, 1.00, 1.00), 0.4, 12_000.0, 0.20, 0.98, 0.20, 0.20),
+        (258.0, -6.6, 0.45, 0.160, 0.0185, (1.00, 1.00, 1.00), 0.4, 4_200.0, 0.20, 0.98, 0.20, 0.20),
         (198.0, -32.0, 0.25, 0.080, 0.008, (1.20, 0.86, 1.08), 2.1, 2_200.0, 0.00, 0.45, 0.95, 0.08),
         (205.0, -43.0, 0.33, 0.100, 0.012, (1.14, 0.90, 1.16), 4.0, 1_700.0, 0.00, 0.38, 0.95, 0.08),
     )
@@ -677,16 +676,32 @@ def make_local_partial_screens(
                 + 0.30 * np.sin(2.6 * nz + 1.2 * nx - 0.4 * phase)
             )
             if screen_index == 0:
-                # The fitted warm-gas filling factor is 0.3 (+0.3/-0.1), not
-                # evidence for a hand-selected 70--98% covering sector. Keep
-                # only gentle cloud-to-cloud modulation and taper continuously
-                # with the shell column. This preserves the observed bright
-                # limb without drawing a sharp geometric bite at 1 MHz.
-                cloud_modulation = np.clip(
-                    1.0 + 0.16 * np.tanh(surface_mode), 0.8, 1.2
+                # H-alpha EM already contains the volume filling factor through
+                # EM=n_e^2 f L. It must not be multiplied by f again as though
+                # f were an areal covering fraction. The observed morphology is
+                # diffuse rather than a geometric shell edge. Keep this as a
+                # single literature-sized Gaussian: no limb, sector, or
+                # corrugation is warranted by the confused low-latitude data.
+                center_direction = center / np.linalg.norm(center)
+                angular_offset = np.degrees(
+                    np.arccos(
+                        np.clip(
+                            directions[start:stop] @ center_direction,
+                            -1.0,
+                            1.0,
+                        )
+                    )
                 )
-                column_presence = -np.expm1(-em / 25.0)
-                arc_fraction = 0.30 * cloud_modulation * column_presence
+                interior_em = 190.0 * np.exp(
+                    -0.5 * (angular_offset / 11.5) ** 2
+                )
+                effective_em = interior_em
+                # Many individually opaque clumps can cover most of a degree
+                # scale beam even when their volume filling factor is small.
+                # This Poisson covering law preserves the Gaussian EM column
+                # while matching the roughly threefold 4-MHz depression.
+                arc_fraction = -np.expm1(-effective_em / 70.0)
+                em = effective_em / np.maximum(arc_fraction, 1.0e-12)
             else:
                 arc_fraction = fmin + (fmax - fmin) / (
                     1.0
