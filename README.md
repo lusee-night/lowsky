@@ -6,6 +6,9 @@ Haslam or ULSA.
 
 ![One realization at 1, 10, 30, and 50 MHz](docs/sky_frequencies.png)
 
+The 1 MHz panel is strongly prior-sensitive: the dark southern lobe is a
+saturated Orion–Eridanus screen in this realization, not a robust prediction.
+
 The model includes synchrotron emission, free-free transfer, spiral structure,
 the Local Bubble, nearby shells and spurs, Gum, Orion–Eridanus, Cygnus X, an
 isotropic extragalactic background, and optional analytic A-team sources.
