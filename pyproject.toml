@@ -41,7 +41,6 @@ Repository = "https://github.com/lusee-night/lowsky"
 [tool.setuptools]
 packages = ["lowsky"]
 package-dir = {lowsky = "src/lowsky"}
-py-modules = ["counterfactual_ulsa", "plot_harmonic_power", "validate_feature_fidelity"]
 
 [tool.pytest.ini_options]
 testpaths = ["."]

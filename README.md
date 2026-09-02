@@ -1,142 +1,106 @@
-# Counterfactual ULSA realization
+# lowsky
 
-This project generates a new low-frequency sky realization with the physical
-structure of Cong et al. (2021), without using Haslam pixels as a residual
-template.
+`lowsky` makes physics-based, counterfactual low-frequency skies. It models
+the Milky Way in three dimensions instead of copying residual pixels from
+Haslam or ULSA.
 
-The model includes:
+![One realization at 1, 10, 30, and 50 MHz](docs/sky_frequencies.png)
 
-- the fitted cylindrical Galactic synchrotron emissivity from ULSA Eq. 17 and
-  Table 1;
-- an NE2001-inspired thick disk, thin disk, five logarithmic spiral arms, and
-  Galactic-center electron component;
-- line-of-sight free-free absorption and thermal free-free emission at
-  `Te = 8000 K`;
-- correlated Kolmogorov-like emission-measure fluctuations in distance shells,
-  replacing catalogued pencil-beam clumps;
-- independent synchrotron fluctuations with input `C_ell proportional to
-  ell^-2.7`, also distributed across distance shells;
-- a fresh, smooth direction-dependent synchrotron-index field using ULSA's
-  direction-dependent variant (ULSA treats its frequency-curved index as a
-  separate alternative model);
-- the ARCADE-2 isotropic extragalactic background and small CGM/IGM opacity;
-- explicit Cas A, Cyg A, Tau A, and Vir A components, rather than allowing
-  those sources to leak into the diffuse template.
-- a seeded population of 3--6 nearby radio-loop/superbubble analogues, including
-  one Loop-I-scale object at a random sky position. Continuous Gaussian radial
-  emissivity and fine local ray quadrature generate soft limb brightening;
-  magnetic shock obliquity, ambient-density gradients, and correlated surface
-  modes generate partial turbulent spurs without drawing 2-D arcs.
-- a configurable smooth shell-spectrum break near 30 MHz, reflecting the
-  observed flattening between the 408- and 22-MHz Loop-I measurements rather
-  than extrapolating a steep GHz-band index unchanged to 1 MHz.
+The model includes synchrotron emission, free-free transfer, spiral structure,
+the Local Bubble, nearby shells and spurs, Gum, Orion–Eridanus, Cygnus X, an
+isotropic extragalactic background, and optional analytic A-team sources.
 
-JAX evaluates the three-dimensional model, performs radiative transfer, and
-gradient-tunes emissivity, emission measure, and spectral-index offsets to the
-mounted ULSA global spectrum. Healpy is restricted to HEALPix geometry and
-spherical-harmonic synthesis/analysis.
+## Install
 
-The default calculation traces every extended component at NSIDE 64 and
-transforms those native maps directly to packed healpy coefficients through
-ell = 191. Cas A, Cyg A, Tau A, and Vir A are never painted into pixels:
-LuSEEpy supplies their analytic delta-function coefficients
-`a_lm = A_nu Y_lm*(n_source)`. The un-beamed harmonic sum is the canonical sky
-product. A common 2-degree beam is applied only when reconstructing the
-NSIDE-32 diagnostic FITS maps.
-
-Install from GitHub:
+Python 3.12 is required.
 
 ```bash
-python -m pip install "lowsky @ git+https://github.com/lusee-night/lowsky.git"
+pip install "lowsky @ git+https://github.com/lusee-night/lowsky.git"
 ```
 
-Generate a realization using a downloaded or mounted ULSA reference product:
+For development:
+
+```bash
+git clone https://github.com/lusee-night/lowsky.git
+cd lowsky
+uv sync --extra dev
+```
+
+## Differentiable API
+
+`generate_sky` is the main package output. It is written entirely with JAX and
+returns brightness temperature in kelvin with shape `(frequency, pixel)`.
+
+```python
+import jax
+import jax.numpy as jnp
+
+from lowsky import SkyConfig, SkyParameters, generate_sky, prepare_sky_inputs
+
+# Geometry, seeded random fields, and catalogs are prepared outside the JAX graph.
+inputs = prepare_sky_inputs(
+    SkyConfig(nside=32, ray_oversample=1, sky_mode="ours", seed=20260901)
+)
+parameters = SkyParameters(
+    emissivity_scale=1.0,
+    emission_measure_scale=1.0,
+    spectral_index_offset=0.0,
+)
+
+frequencies_mhz = jnp.array([1.0, 10.0, 30.0, 50.0])
+sky_k = jax.jit(generate_sky)(frequencies_mhz, inputs, parameters)
+```
+
+`SkyInputs` and `SkyParameters` are JAX pytrees. The output can be used with
+`jax.jit`, `jax.grad`, `jax.jacfwd`, and `jax.vmap`. Use
+`generate_sky_components` when individual physical components are needed.
+
+## ULSA drop-in file
+
+Create a replacement for `ULSA_32_ddi_smooth.fits` without reading the mounted
+ULSA artifact:
+
+```bash
+uv run python examples/export_ulsa_dropin.py \
+  --sky-mode ours \
+  --output ULSA_32_ddi_smooth.fits
+```
+
+The writer enforces the LuSEEpy contract: one float64 primary HDU containing
+50 Galactic RING-ordered NSIDE-32 maps for 1–50 MHz, with the original ULSA
+header layout.
+
+## Full pipeline
+
+The calibrated pipeline compares a realization with an external ULSA reference,
+creates diagnostic FITS maps, and saves canonical un-beamed harmonic products:
 
 ```bash
 lowsky-generate \
   --mounted-ulsa /path/to/ULSA_32_ddi_smooth.fits \
+  --sky-mode ours \
   --output-dir lowsky-output
 ```
 
-The same model is available as a Python API:
+Extended components are generated on the higher-resolution ray grid and then
+transformed to spherical harmonics. Cas A, Cyg A, Tau A, and Vir A are inserted
+as analytic band-limited delta functions. A beam is applied only to diagnostic
+maps.
 
-```python
-from pathlib import Path
-
-import lowsky
-
-config = lowsky.SkyConfig(sky_mode="ours", seed=20260901)
-maps, fit, sources, shells, alms = lowsky.generate(
-    config,
-    Path("/path/to/ULSA_32_ddi_smooth.fits"),
-)
-```
-
-`maps` contains beam-convolved diagnostic maps. `alms` is the canonical
-un-beamed product: every extended component is transformed from the native
-high-resolution realization, while each A-team source is inserted analytically
-as a band-limited delta function.
-
-For a counterfactual realization conditioned on approximate Milky Way
-geography, add `--sky-mode ours`. This anchors named loop directions, an
-offset Local Bubble, Gum, Orion--Eridanus, Cygnus X, the solar position, warp,
-bar, and modest arm contrast while retaining seeded uncertainty and using no
-sky-map pixels.
-
-The literature notes are in `references/`. The canonical
-`counterfactual_ulsa_harmonic.npz` contains diffuse, individual-source,
-combined-source, and total coefficients. Generated diagnostic FITS maps,
-component arrays, spectra, metrics, and comparison plots are also written to
-the chosen output directory.
-
-To compare the canonical source-free and analytic point-source angular power
-directly, without synthesizing a map or applying a beam, run:
+Additional examples:
 
 ```bash
-lowsky-power --input lowsky-output/counterfactual_ulsa_harmonic.npz
+uv run python examples/plot_harmonic_power.py --help
+uv run python examples/validate_feature_fidelity.py --help
 ```
 
-This writes a log-log comparison figure, all-frequency numerical spectra, and
-a CSV of source/diffuse ratios and sustained crossover multipoles beside the
-input harmonic product.
+Validation notebooks are in [`notebooks/`](notebooks/). The diffuse morphology
+has been resolution-validated through `ell = 64`; higher multipoles are retained
+but should not be interpreted as converged small-scale structure.
 
-The literature and numerical feature audit is reproducible with:
+## Scope
 
-```bash
-lowsky-validate lowsky-output
-```
-
-It checks Local-Bubble dimensions, named-loop geometry/contrast/spectra,
-regional Gum/Orion/Cygnus emission measures, harmonic additivity, and an
-NSIDE-64 versus NSIDE-128 shell convergence experiment. The current diffuse
-morphology is validated through `ell=64`; coefficients above that band limit
-are retained but must not be treated as resolution-converged morphology.
-
-The mounted product identifies itself as ULSA's direction-dependent-index,
-smooth-absorber field (`ULSA_FIELD=smooth_absorb`), rather than a final
-Haslam-residual-added map.  Comparisons therefore use that field directly.
-The output FITS primary HDU is the beam-convolved diagnostic counterfactual
-sky. `NO_SOURCES` is
-the diffuse sky; `ATEAM` is the sum of the four explicit sources;
-`STOCHASTIC_SYNCH`, `LOCAL_SHELLS`, `FREEFREE`, and `EXTRAGALACTIC` add to
-`NO_SOURCES`.
-`BASELINE` contains the ULSA-tuned source-free sky before `LOCAL_SHELLS` is
-added.
-`SMOOTH_SYNCH` is the no-fluctuation synchrotron diagnostic and is not an
-additional additive component.
-
-The smooth/turbulent baseline is tuned to the mounted ULSA global mean; the
-independently normalized local shells are added afterward and are not tuned
-away. Its `comparison_metrics.json` separately
-records total and diffuse angular slopes, combined A-team bandpower, and each
-source's isolated bandpower. The source spectra remain phenomenological
-low-frequency extrapolations, but their spatial rendering is an exact
-band-limited delta function. Beam convolution belongs to the instrument or a
-requested visualization, not to the canonical source model.
-
-This is a controlled counterfactual simulation, not a replacement observational
-sky survey. In particular, the statistically represented unresolved HII/WIM
-clumping is intentionally not the catalogued NE2001 clump realization.
-Ordinary unresolved SNRs remain in the statistical synchrotron component at
-the current 2-degree resolution; the explicit shells represent the resolved
-local-loop population.
+This is a controlled simulator, not an observational survey. It uses ULSA’s
+radiative-transfer ingredients and global calibration while deliberately
+avoiding a Haslam residual template. See [`references/`](references/) for the
+physical anchors and literature notes.

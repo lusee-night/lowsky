@@ -1,8 +1,19 @@
-"""Physics-based counterfactual ultra-low-frequency sky simulations."""
+"""Differentiable, physics-based ultra-low-frequency sky simulations."""
 
-from counterfactual_ulsa import (
+from .model import (
+    SkyComponents,
+    SkyInputs,
+    SkyParameters,
+    generate_sky,
+    generate_sky_components,
+    optical_depth_coefficient,
+    smooth_broken_power_law,
+    transfer_frequency,
+)
+from .pipeline import (
     ATEAM,
     LocalShellCatalog,
+    PreparedSky,
     SkyConfig,
     TunedParameters,
     ateam_integrated_k_sr,
@@ -12,28 +23,53 @@ from counterfactual_ulsa import (
     make_local_shell_catalog,
     make_our_sky_shell_catalog,
     map_cube_to_alm,
+    prepare_sky,
+    prepare_sky_inputs,
     write_fits,
     write_harmonic_product,
 )
-from plot_harmonic_power import analyze, first_sustained_dominance, power_from_alms
+from .power import analyze, first_sustained_dominance, power_from_alms
+from .ulsa_compat import (
+    ULSA_FREQUENCIES_MHZ,
+    ULSA_NPIX,
+    ULSA_NSIDE,
+    validate_ulsa_dropin,
+    write_ulsa_dropin,
+)
 
 __version__ = "0.1.0"
 
 __all__ = [
     "ATEAM",
     "LocalShellCatalog",
+    "PreparedSky",
     "SkyConfig",
+    "SkyComponents",
+    "SkyInputs",
+    "SkyParameters",
     "TunedParameters",
+    "ULSA_FREQUENCIES_MHZ",
+    "ULSA_NPIX",
+    "ULSA_NSIDE",
     "analyze",
     "ateam_integrated_k_sr",
     "beam_convolved_maps",
     "exact_ateam_alms",
     "first_sustained_dominance",
     "generate",
+    "generate_sky",
+    "generate_sky_components",
     "make_local_shell_catalog",
     "make_our_sky_shell_catalog",
     "map_cube_to_alm",
     "power_from_alms",
+    "prepare_sky",
+    "prepare_sky_inputs",
+    "optical_depth_coefficient",
+    "smooth_broken_power_law",
+    "transfer_frequency",
     "write_fits",
     "write_harmonic_product",
+    "validate_ulsa_dropin",
+    "write_ulsa_dropin",
 ]
