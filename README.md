@@ -4,7 +4,7 @@
 the Milky Way in three dimensions instead of copying residual pixels from
 Haslam or ULSA.
 
-![One realization at 1, 10, 30, and 50 MHz](docs/sky_frequencies.png)
+![One realization at 1, 10, 30, and 50 MHz](docs/sky_frequencies_a07a609.png)
 
 The 1 MHz morphology is especially prior-sensitive because even modest ionized
 filaments become optically thick; isolated dark patches are not robust pixels.
