@@ -64,10 +64,21 @@ a mean wall near 170 pc, ordinary directions spanning roughly 70--220 pc, a
 and Orion--Eridanus are broad, ellipsoidal 3D ionized
 interfaces integrated on a dedicated 2-pc radial grid. Gum uses the
 Purcell et al. center (l=258 deg, b=-6.6 deg), 450-pc distance, 160-pc radius,
-and 18.5-pc wall. Coherent sectors span roughly 0.2--0.98 projected covering
-at the 2-degree output scale, with the high-covering area comparable to the
-observed clean upper/central shell, and bright sectors in the measured
-220--470 pc cm^-6 range.
+and 18.5-pc wall. The radio-polarization fit's warm-gas filling factor
+f=0.3 (+0.3/-0.1) is used as the central unresolved-covering prior, with only
+gentle cloud-to-cloud modulation and a continuous column-density taper. We do
+not infer discrete high-covering sectors from the fit: Purcell et al. model
+only the relatively clean upper nebula, while the plane and lower nebula are
+explicitly described as confused. The normalization follows their azimuthal
+H-alpha profile: roughly 80 pc cm^-6 in the interior, a 220 pc cm^-6 limb,
+and no more than 30 pc cm^-6 outside.
+The fitted 22.7-degree circumference is an analytic shell boundary, not a
+resolved, uniformly sharp absorption mask. Purcell et al. explicitly restrict
+their fit to the clean upper nebula; the Galactic-plane and lower regions are
+confused by other HII regions, remnants, and the possibly separate IRAS Vela
+Shell. Woermann et al. also find a smaller, asymmetric expanding neutral shell
+(10.5-degree mean and 14-degree maximum radius), reinforcing that the phases
+and outlines should not be collapsed into one crisp disk.
 Orion--Eridanus uses two overlapping, much more sparsely covering shell
 pieces across its observed 150--250 pc depth rather than one wall. Cygnus X is
 a degree-scale sub-grid surrogate centered at 1.45 kpc and normalized to the

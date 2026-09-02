@@ -9,6 +9,7 @@ from counterfactual_ulsa import (
     _smooth_broken_power_law_scale,
     exact_ateam_alms,
     local_bubble_boundary_kpc,
+    make_local_partial_screens,
     make_local_shell_catalog,
     make_orion_partial_screens,
     make_random_fields,
@@ -79,6 +80,32 @@ def test_orion_filaments_are_thin_partial_covering_screens():
     assert 0.02 <= np.mean(effective_covering[aperture]) <= 0.05
     assert np.mean(effective_covering[aperture] > 0.25) <= 0.07
     assert np.all((distance > 0.0) & (distance < 0.651))
+
+
+def test_gum_screen_is_diffuse_without_an_invented_high_covering_sector():
+    config = SkyConfig(nside=32, ray_oversample=1, sky_mode="ours")
+    geometry = prepare_geometry(config)
+    emission_measure, covering, _distance = make_local_partial_screens(
+        config, geometry
+    )
+    vectors = np.asarray(
+        hp.ang2vec(geometry["l_deg"], geometry["b_deg"], lonlat=True)
+    )
+    center = np.asarray(hp.ang2vec(258.0, -6.6, lonlat=True))
+    separation = np.degrees(np.arccos(np.clip(vectors @ center, -1.0, 1.0)))
+    interior = separation < 15.0
+    inner_edge = (separation >= 20.0) & (separation < 22.0)
+    outer_edge = (separation >= 22.0) & (separation < 24.0)
+    exterior = (separation >= 24.0) & (separation < 26.0)
+
+    assert np.max(covering[0]) < 0.37
+    assert np.percentile(covering[0, interior], 90) - np.percentile(
+        covering[0, interior], 10
+    ) < 0.10
+    assert np.median(covering[0, inner_edge]) > np.median(
+        covering[0, outer_edge]
+    ) > np.median(covering[0, exterior])
+    assert np.percentile(emission_measure[0, inner_edge], 50) > 500.0
 
 
 def test_source_templates_have_unit_solid_angle_integral():

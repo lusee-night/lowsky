@@ -64,18 +64,32 @@ def audit(output_dir: Path) -> dict[str, object]:
     }
     regional_em = {name: percentiles(values) for name, values in regions.items()}
     gum_mask = angular_mask(nside, 258.0, -6.6, 23.0)
+    gum_interior_mask = angular_mask(nside, 258.0, -6.6, 15.0)
+    gum_limb_mask = angular_mask(nside, 258.0, -6.6, 22.0) & ~angular_mask(
+        nside, 258.0, -6.6, 18.0
+    )
     gum_outer_mask = angular_mask(nside, 258.0, -6.6, 30.0) & ~angular_mask(
         nside, 258.0, -6.6, 25.0
     )
+    gum_effective_em = gum_em_clump * gum_covering * em_scale
     gum_screen = {
         "mean_effective_covering": float(np.mean(gum_covering[gum_mask])),
-        "fraction_covering_above_0p7": float(
-            np.mean(gum_covering[gum_mask] > 0.7)
+        "interior_covering_p10": float(
+            np.percentile(gum_covering[gum_interior_mask], 10.0)
+        ),
+        "interior_covering_p90": float(
+            np.percentile(gum_covering[gum_interior_mask], 90.0)
         ),
         "outer_annulus_mean_covering": float(np.mean(gum_covering[gum_outer_mask])),
         "outer_annulus_max_covering": float(np.max(gum_covering[gum_outer_mask])),
-        "clump_em_p95_pc_cm6": float(
-            np.percentile(gum_em_clump[gum_mask] * em_scale, 95.0)
+        "interior_effective_em_median_pc_cm6": float(
+            np.median(gum_effective_em[gum_interior_mask])
+        ),
+        "limb_effective_em_median_pc_cm6": float(
+            np.median(gum_effective_em[gum_limb_mask])
+        ),
+        "outside_effective_em_p95_pc_cm6": float(
+            np.percentile(gum_effective_em[gum_outer_mask], 95.0)
         ),
     }
     orion_mask = angular_mask(nside, 202.0, -38.0, 35.0)
@@ -159,15 +173,24 @@ def audit(output_dir: Path) -> dict[str, object]:
     checks = {
         "local_bubble_mean_140_200pc": 140.0 <= bubble["mean"] <= 200.0,
         "local_bubble_has_70_600pc_span": bubble["p05"] <= 120.0 and bubble["p99"] >= 600.0,
-        "gum_bright_clump_em_150_470": 150.0
-        <= gum_screen["clump_em_p95_pc_cm6"]
-        <= 470.0,
-        "gum_projected_covering_is_coherent": gum_screen[
-            "fraction_covering_above_0p7"
-        ] >= 0.35,
-        "gum_absorption_confined_to_23deg_shell": gum_screen[
-            "outer_annulus_max_covering"
-        ] <= 0.10,
+        "gum_covering_matches_clumpy_filling_prior": 0.20
+        <= gum_screen["mean_effective_covering"]
+        <= 0.40,
+        "gum_has_no_invented_high_covering_sector": gum_screen[
+            "interior_covering_p90"
+        ]
+        - gum_screen["interior_covering_p10"]
+        <= 0.12,
+        "gum_diffuse_interior_em_50_130": 50.0
+        <= gum_screen["interior_effective_em_median_pc_cm6"]
+        <= 130.0,
+        "gum_limb_em_150_300": 150.0
+        <= gum_screen["limb_effective_em_median_pc_cm6"]
+        <= 300.0,
+        "gum_outside_em_below_30": gum_screen[
+            "outside_effective_em_p95_pc_cm6"
+        ]
+        <= 30.0,
         "orion_em_not_uniform_or_saturated": regional_em["orion_eridanus"]["p95"] < 150.0,
         "orion_partial_covering_2_5_percent": 0.02
         <= orion_screen["mean_effective_covering"]
