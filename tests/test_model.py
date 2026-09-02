@@ -18,6 +18,11 @@ def small_inputs() -> SkyInputs:
         shell_foreground_emission_measure=jnp.full((2, 2, pixels), 0.3),
         shell_spectral_index=jnp.asarray([-2.7, -2.9]),
         shell_low_frequency_spectral_index=jnp.asarray([-2.5, -2.6]),
+        shell_distance_kpc=jnp.full((2, 2, pixels), 0.15),
+        partial_screen_emission_measure=jnp.zeros((1, pixels)),
+        partial_screen_covering_fraction=jnp.zeros((1, pixels)),
+        partial_screen_distance_kpc=jnp.full((1, pixels), 0.5),
+        distance_midpoint_kpc=jnp.asarray([0.125, 0.375, 0.625, 0.875]),
         distance_step_kpc=jnp.asarray(0.25),
     )
 
@@ -69,3 +74,17 @@ def test_precomputed_additive_components_stay_inside_jax_graph():
         generate_sky(frequencies, inputs, additive_temperature=additive),
         baseline + 7.0,
     )
+
+
+def test_opaque_partial_screen_beam_averages_in_transmission_space():
+    inputs = small_inputs()._replace(
+        emissivity_408=jnp.zeros((3, 4)),
+        emission_measure_rate=jnp.zeros((3, 4)),
+        shell_emission_408=jnp.zeros((2, 2, 3)),
+        partial_screen_emission_measure=jnp.full((1, 3), 100.0),
+        partial_screen_covering_fraction=jnp.full((1, 3), 0.1),
+    )
+    components = generate_sky_components(jnp.asarray([1.0]), inputs)
+    # The filament itself is opaque, but covers only 10% of each beam. Its
+    # thermal contribution is therefore 0.1 Te, not a full 8000-K screen.
+    np.testing.assert_allclose(components.free_free[0], 800.0, rtol=1e-5)

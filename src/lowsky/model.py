@@ -20,10 +20,11 @@ MHZ_TO_GHZ = 1.0e-3
 class SkyInputs(NamedTuple):
     """Prepared spatial fields consumed by the differentiable model.
 
-    The first three fields have shape ``(pixel, distance)``.  ``spectral_index``
-    has shape ``(pixel,)``.  The shell arrays have shape
-    ``(shell, distance_bin, pixel)``, while both shell-index arrays have shape
-    ``(shell,)``.
+    The first three fields have shape ``(pixel, distance)``. ``spectral_index``
+    has shape ``(pixel,)``. Radio-shell arrays have shape
+    ``(shell, distance_bin, pixel)``. Partial ionized screens have shape
+    ``(screen, pixel)``; their covering fractions are beam-area fractions,
+    not factors multiplying emission measure.
     """
 
     emissivity_408: jax.Array
@@ -34,6 +35,11 @@ class SkyInputs(NamedTuple):
     shell_foreground_emission_measure: jax.Array
     shell_spectral_index: jax.Array
     shell_low_frequency_spectral_index: jax.Array
+    shell_distance_kpc: jax.Array
+    partial_screen_emission_measure: jax.Array
+    partial_screen_covering_fraction: jax.Array
+    partial_screen_distance_kpc: jax.Array
+    distance_midpoint_kpc: jax.Array
     distance_step_kpc: jax.Array
 
 
@@ -114,6 +120,33 @@ def transfer_frequency(
     tau_mid = tau_coefficient * cumulative_em_mid
     tau_total = tau_coefficient * cumulative_em_edge[:, -1]
 
+    # Beam-average each unresolved ionized screen in transmission space. This
+    # is deliberately not exp(-tau * covering): optically thick filaments may
+    # cover only a small part of a pixel. Screens affect only emission behind
+    # their physical distance, while the smooth WIM/inner Galaxy remains a
+    # full-covering volume component.
+    partial_tau = (
+        tau_coefficient
+        * parameters.emission_measure_scale
+        * inputs.partial_screen_emission_measure
+    )
+    partial_absorbed_fraction = inputs.partial_screen_covering_fraction * (
+        -jnp.expm1(-partial_tau)
+    )
+    partial_transmission = 1.0 - partial_absorbed_fraction
+    behind_screen = (
+        inputs.distance_midpoint_kpc[None, None, :]
+        >= inputs.partial_screen_distance_kpc[:, :, None]
+    )
+    line_of_sight_partial_transmission = jnp.prod(
+        jnp.where(
+            behind_screen,
+            partial_transmission[:, :, None],
+            1.0,
+        ),
+        axis=0,
+    )
+
     spectral_index = inputs.spectral_index + parameters.spectral_index_offset
     frequency_scale = (frequency_mhz / 408.0) ** spectral_index
     base_emission = (
@@ -121,7 +154,7 @@ def transfer_frequency(
         * parameters.emissivity_scale
         * frequency_scale[:, None]
     )
-    attenuation = jnp.exp(-tau_mid)
+    attenuation = jnp.exp(-tau_mid) * line_of_sight_partial_transmission
     smooth_synchrotron = jnp.sum(
         base_emission * attenuation * inputs.distance_step_kpc, axis=1
     )
@@ -132,12 +165,16 @@ def transfer_frequency(
         * inputs.distance_step_kpc,
         axis=1,
     )
-    free_free = parameters.electron_temperature_k * (-jnp.expm1(-tau_total))
+    total_partial_transmission = jnp.prod(partial_transmission, axis=0)
+    total_transmission = jnp.exp(-tau_total) * total_partial_transmission
+    free_free = parameters.electron_temperature_k * (1.0 - total_transmission)
 
     extragalactic_unabsorbed = 1.2 * (frequency_mhz / 1_000.0) ** -2.58
     circumgalactic_optical_depth = 0.95 * (frequency_mhz / 1.0) ** -2.1
-    extragalactic = extragalactic_unabsorbed * jnp.exp(
-        -tau_total - circumgalactic_optical_depth
+    extragalactic = (
+        extragalactic_unabsorbed
+        * total_transmission
+        * jnp.exp(-circumgalactic_optical_depth)
     )
 
     shell_scale = smooth_broken_power_law(
@@ -147,9 +184,22 @@ def transfer_frequency(
         parameters.shell_spectral_break_mhz,
         parameters.shell_spectral_smoothness,
     )
+    screen_before_radio_shell = (
+        inputs.partial_screen_distance_kpc[:, None, None, :]
+        <= inputs.shell_distance_kpc[None, :, :, :]
+    )
+    radio_shell_partial_transmission = jnp.prod(
+        jnp.where(
+            screen_before_radio_shell,
+            partial_transmission[:, None, None, :],
+            1.0,
+        ),
+        axis=0,
+    )
     local_shells = jnp.sum(
         inputs.shell_emission_408
         * shell_scale
+        * radio_shell_partial_transmission
         * jnp.exp(
             -tau_coefficient
             * parameters.emission_measure_scale

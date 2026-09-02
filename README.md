@@ -6,12 +6,14 @@ Haslam or ULSA.
 
 ![One realization at 1, 10, 30, and 50 MHz](docs/sky_frequencies.png)
 
-The 1 MHz panel is strongly prior-sensitive: the dark southern lobe is a
-saturated Orion–Eridanus screen in this realization, not a robust prediction.
+The 1 MHz morphology is especially prior-sensitive because even modest ionized
+filaments become optically thick; isolated dark patches are not robust pixels.
 
 The model includes synchrotron emission, free-free transfer, spiral structure,
 the Local Bubble, nearby shells and spurs, Gum, Orion–Eridanus, Cygnus X, an
 isotropic extragalactic background, and optional analytic A-team sources.
+Diffuse WIM and Galactic-center absorption are volume-filling. Thin nearby
+ionized filaments use explicit sub-beam partial-covering transfer.
 
 ## Install
 
@@ -60,8 +62,10 @@ sky_k = jax.jit(generate_sky)(frequencies_mhz, inputs, parameters)
 
 ## ULSA drop-in file
 
-Create a replacement for `ULSA_32_ddi_smooth.fits` without reading the mounted
-ULSA artifact:
+Download the calibrated 1--50 MHz NSIDE-32 replacement from the
+[latest release](https://github.com/lusee-night/lowsky/releases/latest/download/ULSA_32_ddi_smooth.fits),
+or generate a new realization locally without reading the mounted ULSA
+artifact:
 
 ```bash
 uv run python examples/export_ulsa_dropin.py \
@@ -93,6 +97,7 @@ maps.
 Additional examples:
 
 ```bash
+uv run python examples/plot_frequency_skies.py lowsky-output/counterfactual_ulsa_nside32_1_50mhz.fits
 uv run python examples/plot_harmonic_power.py --help
 uv run python examples/validate_feature_fidelity.py --help
 ```

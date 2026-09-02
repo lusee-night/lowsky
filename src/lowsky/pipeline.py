@@ -580,54 +580,6 @@ def physical_fields(
             solar_height_kpc + distance * jnp.sin(bb),
         )
 
-    def diffuse_shell_em(
-        l_deg: float,
-        b_deg: float,
-        distance: float,
-        shell_radius: float,
-        fwhm: float,
-        peak_rate: float,
-        stretch: tuple[float, float, float],
-        phase: float,
-    ) -> jnp.ndarray:
-        """A broad, distorted, incomplete ionized superbubble interface."""
-        cx, cy, cz = center_from_lbd(l_deg, b_deg, distance)
-        dx, dy, dz = x - cx, y - cy, z - cz
-        sx, sy, sz = stretch
-        rr = jnp.sqrt((dx / sx) ** 2 + (dy / sy) ** 2 + (dz / sz) ** 2)
-        nx = dx / jnp.maximum(rr * sx, 1e-8)
-        ny = dy / jnp.maximum(rr * sy, 1e-8)
-        nz = dz / jnp.maximum(rr * sz, 1e-8)
-        surface_mode = (
-            0.65 * jnp.sin(2.3 * nx + 1.7 * ny + phase)
-            + 0.45 * jnp.sin(3.1 * ny - 1.4 * nz + 0.7 * phase)
-            + 0.30 * jnp.sin(2.6 * nz + 1.2 * nx - 0.4 * phase)
-        )
-        distortion = jnp.tanh(surface_mode)
-        local_radius = shell_radius * (1.0 + 0.10 * distortion)
-        sigma = fwhm / jnp.sqrt(8.0 * jnp.log(2.0))
-        local_sigma = sigma * (1.0 + 0.40 * jnp.tanh(surface_mode + 0.5 * nz))
-        radial = jnp.exp(-0.5 * ((rr - local_radius) / local_sigma) ** 2)
-        # Ionized interfaces are fragmented by blowouts and ambient-density
-        # structure.  A soft covering fraction avoids an unphysical complete
-        # absorbing ring while retaining coherent HII arcs.
-        covering = 1.0 / (1.0 + jnp.exp(-jnp.clip((surface_mode + 0.05) / 0.22, -30.0, 30.0)))
-        return peak_rate * radial * (0.015 + 0.985 * covering)
-
-    # A broad, patchy Gum interface is normalized so that diffuse sight lines
-    # span tens of pc cm^-6 while bright sectors reach the measured
-    # 220--470 pc cm^-6 range after the global EM calibration.
-    gum_em = diffuse_shell_em(
-        264.0, -4.0, 0.45, 0.16, 0.060, 1_520.0, (1.12, 0.92, 1.08), 0.4
-    )
-    # Orion--Eridanus is a nested 150--250 pc shell complex, not a single
-    # coherent bubble wall (Joubaud et al. 2019).
-    orion_near_em = diffuse_shell_em(
-        198.0, -36.0, 0.24, 0.10, 0.050, 260.0, (1.20, 0.86, 1.08), 2.1
-    )
-    orion_outer_em = diffuse_shell_em(
-        205.0, -40.0, 0.38, 0.16, 0.075, 220.0, (1.14, 0.90, 1.16), 4.0
-    )
     cx, cy, cz = center_from_lbd(80.0, 0.0, 1.45)
     # At our ~degree native resolution, the observed 4.3-pc Cygnus filaments
     # are necessarily a beam-averaged sub-grid complex.  The normalization
@@ -636,10 +588,121 @@ def physical_fields(
     cygnus_em = 14_000.0 * jnp.exp(
         -0.5 * (((x - cx) / 0.10) ** 2 + ((y - cy) / 0.10) ** 2 + ((z - cz) / 0.065) ** 2)
     )
-    anchor_em_rate = conditioned_weight * (
-        gum_em + orion_near_em + orion_outer_em + cygnus_em
-    )
+    # Nearby thin ionized shells are integrated separately below.  Putting
+    # them on this coarse Galactic distance grid artificially broadens their
+    # projected absorption footprints.
+    anchor_em_rate = conditioned_weight * cygnus_em
     return emissivity_408, em_rate + anchor_em_rate, anchor_em_rate
+
+
+def make_local_partial_screens(
+    config: SkyConfig,
+    geometry: dict[str, np.ndarray],
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Ray-trace nearby ionized shells as partial-cover screens.
+
+    Gum's roughly 15--20 pc wall and Orion--Eridanus's 5--13 pc filaments are
+    both narrower than the global radial sampling.  A dedicated 2-pc grid
+    avoids numerically inflating their angular sizes.  Emission measure inside
+    a clump and projected covering fraction remain separate because
+    ``1-f+f*exp(-tau)`` is not ``exp(-f*tau)``.
+    """
+
+    npix = hp.nside2npix(int(geometry["nside"]))
+    if config.sky_mode != "ours":
+        zeros = np.zeros((3, npix), dtype=np.float64)
+        return zeros, zeros, np.full((3, npix), 0.25, dtype=np.float64)
+
+    l = np.radians(np.asarray(geometry["l_deg"], dtype=np.float64))
+    b = np.radians(np.asarray(geometry["b_deg"], dtype=np.float64))
+    directions = np.stack(
+        [np.cos(b) * np.sin(l), -np.cos(b) * np.cos(l), np.sin(b)], axis=1
+    )
+    local_s = np.arange(0.001, 0.651, 0.002, dtype=np.float64)
+    ds = 0.002
+    # l, b, center distance, radius, FWHM, axis stretches, phase,
+    # n_e^2-equivalent rate, min/max sub-beam covering, selector threshold
+    # and softness. Gum is first; the two nested Orion interfaces follow.
+    specifications = (
+        # Purcell et al. (2015): D~450 pc, R~160 pc and an 18.5-pc wall.
+        # Its coherent ionized wall can cover much of a degree-scale pixel,
+        # but the measured filling factor motivates non-unity coverage.
+        (258.0, -6.6, 0.45, 0.160, 0.0185, (1.00, 1.00, 1.00), 0.4, 4_200.0, 0.20, 0.98, 0.20, 0.20),
+        (198.0, -32.0, 0.25, 0.080, 0.008, (1.20, 0.86, 1.08), 2.1, 2_200.0, 0.00, 0.45, 0.95, 0.08),
+        (205.0, -43.0, 0.33, 0.100, 0.012, (1.14, 0.90, 1.16), 4.0, 1_700.0, 0.00, 0.38, 0.95, 0.08),
+    )
+    emission_measure = np.zeros((len(specifications), npix), dtype=np.float64)
+    covering = np.zeros_like(emission_measure)
+    distance = np.zeros_like(emission_measure)
+
+    for screen_index, spec in enumerate(specifications):
+        (
+            l_deg, b_deg, center_distance, radius, fwhm, stretch, phase,
+            peak_rate, fmin, fmax, cover_threshold, cover_softness,
+        ) = spec
+        ll, bb = np.radians(l_deg), np.radians(b_deg)
+        center = center_distance * np.asarray(
+            [np.cos(bb) * np.sin(ll), -np.cos(bb) * np.cos(ll), np.sin(bb)]
+        )
+        sx, sy, sz = stretch
+        sigma = fwhm / np.sqrt(8.0 * np.log(2.0))
+        for start in range(0, npix, 4096):
+            stop = min(start + 4096, npix)
+            xyz = directions[start:stop, :, None] * local_s[None, None, :]
+            delta = xyz - center[None, :, None]
+            rr = np.sqrt(
+                (delta[:, 0] / sx) ** 2
+                + (delta[:, 1] / sy) ** 2
+                + (delta[:, 2] / sz) ** 2
+            )
+            radial = np.exp(-0.5 * ((rr - radius) / sigma) ** 2)
+            weight = np.sum(radial, axis=1)
+            em = peak_rate * weight * ds
+            hit_distance = np.sum(radial * local_s[None, :], axis=1) / np.maximum(weight, 1.0e-30)
+
+            hit_xyz = directions[start:stop] * hit_distance[:, None]
+            hit_delta = hit_xyz - center[None, :]
+            hit_rr = np.sqrt(
+                (hit_delta[:, 0] / sx) ** 2
+                + (hit_delta[:, 1] / sy) ** 2
+                + (hit_delta[:, 2] / sz) ** 2
+            )
+            nx = hit_delta[:, 0] / np.maximum(hit_rr * sx, 1.0e-12)
+            ny = hit_delta[:, 1] / np.maximum(hit_rr * sy, 1.0e-12)
+            nz = hit_delta[:, 2] / np.maximum(hit_rr * sz, 1.0e-12)
+            surface_mode = (
+                0.65 * np.sin(2.3 * nx + 1.7 * ny + phase)
+                + 0.45 * np.sin(3.1 * ny - 1.4 * nz + 0.7 * phase)
+                + 0.30 * np.sin(2.6 * nz + 1.2 * nx - 0.4 * phase)
+            )
+            arc_fraction = fmin + (fmax - fmin) / (
+                1.0
+                + np.exp(
+                    -np.clip(
+                        (surface_mode - cover_threshold) / cover_softness,
+                        -30.0,
+                        30.0,
+                    )
+                )
+            )
+            arc_fraction *= 1.0 / (1.0 + np.exp(-np.clip((em - 2.0) / 0.7, -30.0, 30.0)))
+            emission_measure[screen_index, start:stop] = em
+            covering[screen_index, start:stop] = arc_fraction
+            distance[screen_index, start:stop] = np.where(
+                weight > 1.0e-8, hit_distance, center_distance
+            )
+
+    return emission_measure, covering, distance
+
+
+def make_orion_partial_screens(
+    config: SkyConfig,
+    geometry: dict[str, np.ndarray],
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Compatibility helper returning only the two Orion--Eridanus screens."""
+
+    values = make_local_partial_screens(config, geometry)
+    return tuple(value[1:] for value in values)
 
 
 def beta_map(config: SkyConfig, geometry: dict[str, np.ndarray], beta_random: np.ndarray) -> np.ndarray:
@@ -712,6 +775,20 @@ def transfer_one_frequency(
         shell_foreground_emission_measure=shell_foreground_em,
         shell_spectral_index=shell_beta,
         shell_low_frequency_spectral_index=shell_beta_low,
+        shell_distance_kpc=jnp.zeros_like(shell_segment_408),
+        partial_screen_emission_measure=jnp.zeros(
+            (0, emissivity_408.shape[0]), dtype=emissivity_408.dtype
+        ),
+        partial_screen_covering_fraction=jnp.zeros(
+            (0, emissivity_408.shape[0]), dtype=emissivity_408.dtype
+        ),
+        partial_screen_distance_kpc=jnp.zeros(
+            (0, emissivity_408.shape[0]), dtype=emissivity_408.dtype
+        ),
+        distance_midpoint_kpc=(
+            jnp.arange(emissivity_408.shape[1], dtype=emissivity_408.dtype) + 0.5
+        )
+        * ds_kpc,
         distance_step_kpc=ds_kpc,
     )
     parameters = SkyParameters(
@@ -956,6 +1033,9 @@ def prepare_sky(config: SkyConfig) -> PreparedSky:
         np.arange(cumulative_emission_measure.shape[0])[None, None, :],
         shell_distance_index,
     ]
+    local_screen_emission_measure, local_screen_covering, local_screen_distance = (
+        make_local_partial_screens(config, geometry)
+    )
     inputs = SkyInputs(
         emissivity_408=emissivity_408,
         emission_measure_rate=emission_measure_rate,
@@ -969,6 +1049,11 @@ def prepare_sky(config: SkyConfig) -> PreparedSky:
         shell_low_frequency_spectral_index=jnp.asarray(
             local_catalog.low_frequency_beta_temperature
         ),
+        shell_distance_kpc=jnp.asarray(geometry["s"][shell_distance_index]),
+        partial_screen_emission_measure=jnp.asarray(local_screen_emission_measure),
+        partial_screen_covering_fraction=jnp.asarray(local_screen_covering),
+        partial_screen_distance_kpc=jnp.asarray(local_screen_distance),
+        distance_midpoint_kpc=jnp.asarray(geometry["s"]),
         distance_step_kpc=jnp.asarray(geometry["ds"]),
     )
     return PreparedSky(
@@ -1026,25 +1111,17 @@ def generate(
 
     freqs = np.arange(1.0, 51.0)
 
+    parameters = SkyParameters(
+        emissivity_scale=tuned.emissivity_scale,
+        emission_measure_scale=tuned.emission_measure_scale,
+        spectral_index_offset=tuned.beta_offset,
+        electron_temperature_k=config.electron_temperature_k,
+        shell_spectral_break_mhz=config.shell_spectral_break_mhz,
+        shell_spectral_smoothness=config.shell_spectral_smoothness,
+    )
+
     def one(f: float):
-        return transfer_one_frequency(
-            f,
-            emissivity_408,
-            em_rate,
-            jnp.asarray(synch_multiplier),
-            jnp.asarray(beta),
-            shell_segment_408_jax,
-            shell_foreground_em_jax,
-            shell_beta,
-            shell_beta_low,
-            config.shell_spectral_break_mhz,
-            config.shell_spectral_smoothness,
-            geometry["ds"],
-            tuned.emissivity_scale,
-            tuned.emission_measure_scale,
-            tuned.beta_offset,
-            config.electron_temperature_k,
-        )
+        return transfer_frequency(f, inputs, parameters)
 
     transferred = jax.vmap(one)(jnp.asarray(freqs))
     _no_sources, smooth_synch, stochastic_synch, local_shells, freefree, extragalactic = [
@@ -1112,10 +1189,24 @@ def generate(
     }
     ateam = np.sum(list(individual_sources.values()), axis=0)
     total = no_sources + ateam
-    tau_1mhz = _tau_coefficient(jnp.asarray(1.0), config.electron_temperature_k) * jnp.sum(
+    tau_coefficient_1mhz = _tau_coefficient(
+        jnp.asarray(1.0), config.electron_temperature_k
+    )
+    tau_1mhz_smooth = tau_coefficient_1mhz * jnp.sum(
         em_rate * tuned.emission_measure_scale * geometry["ds"], axis=1
     )
+    partial_transmission_1mhz = 1.0 - inputs.partial_screen_covering_fraction * (
+        -jnp.expm1(
+            -tau_coefficient_1mhz
+            * tuned.emission_measure_scale
+            * inputs.partial_screen_emission_measure
+        )
+    )
+    tau_1mhz = tau_1mhz_smooth - jnp.sum(
+        jnp.log(jnp.maximum(partial_transmission_1mhz, 1.0e-12)), axis=0
+    )
     def degrade_scalar(m: np.ndarray) -> np.ndarray:
+        m = np.asarray(m, dtype=np.float64)
         if geometry["nside"] == config.nside:
             return m
         return hp.ud_grade(m, nside_out=config.nside, order_in="RING", order_out="RING", power=0)
@@ -1138,6 +1229,27 @@ def generate(
         ),
         "anchor_em_total": degrade_scalar(
             np.sum(np.asarray(anchor_em_rate) * tuned.emission_measure_scale * geometry["ds"], axis=1)
+            + np.sum(
+                np.asarray(inputs.partial_screen_emission_measure)
+                * np.asarray(inputs.partial_screen_covering_fraction)
+                * tuned.emission_measure_scale,
+                axis=0,
+            )
+        ),
+        "gum_covering": degrade_scalar(
+            np.asarray(inputs.partial_screen_covering_fraction)[0]
+        ),
+        "gum_em_clump": degrade_scalar(
+            np.asarray(inputs.partial_screen_emission_measure)[0]
+        ),
+        "orion_covering": degrade_scalar(
+            1.0
+            - np.prod(
+                1.0 - np.asarray(inputs.partial_screen_covering_fraction)[1:], axis=0
+            )
+        ),
+        "orion_em_clump": degrade_scalar(
+            np.max(np.asarray(inputs.partial_screen_emission_measure)[1:], axis=0)
         ),
     }
     harmonic_products["frequency_mhz"] = freqs
@@ -1183,6 +1295,10 @@ def write_fits(path: Path, products: dict[str, np.ndarray], config: SkyConfig, t
         ("tau_1mhz", ""),
         ("em_total", "pc cm-6"),
         ("anchor_em_total", "pc cm-6"),
+        ("gum_covering", ""),
+        ("gum_em_clump", "pc cm-6"),
+        ("orion_covering", ""),
+        ("orion_em_clump", "pc cm-6"),
     ]:
         hdu = fits.ImageHDU(products[name].astype(np.float32), name=name.upper())
         if unit:

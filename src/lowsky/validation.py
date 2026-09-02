@@ -51,13 +51,43 @@ def audit(output_dir: Path) -> dict[str, object]:
 
     with fits.open(fits_path, memmap=False) as hdus:
         anchor_em = np.asarray(hdus["ANCHOR_EM_TOTAL"].data, dtype=float)
+        em_scale = float(hdus[0].header["EMSCAL"])
+        gum_covering = np.asarray(hdus["GUM_COVERING"].data, dtype=float)
+        gum_em_clump = np.asarray(hdus["GUM_EM_CLUMP"].data, dtype=float)
+        orion_covering = np.asarray(hdus["ORION_COVERING"].data, dtype=float)
+        orion_em_clump = np.asarray(hdus["ORION_EM_CLUMP"].data, dtype=float)
     nside = hp.npix2nside(anchor_em.size)
     regions = {
-        "gum": anchor_em[angular_mask(nside, 264.0, -4.0, 35.0)],
+        "gum": anchor_em[angular_mask(nside, 258.0, -6.6, 23.0)],
         "orion_eridanus": anchor_em[angular_mask(nside, 202.0, -38.0, 35.0)],
         "cygnus_x": anchor_em[angular_mask(nside, 80.0, 0.0, 4.0)],
     }
     regional_em = {name: percentiles(values) for name, values in regions.items()}
+    gum_mask = angular_mask(nside, 258.0, -6.6, 23.0)
+    gum_outer_mask = angular_mask(nside, 258.0, -6.6, 30.0) & ~angular_mask(
+        nside, 258.0, -6.6, 25.0
+    )
+    gum_screen = {
+        "mean_effective_covering": float(np.mean(gum_covering[gum_mask])),
+        "fraction_covering_above_0p7": float(
+            np.mean(gum_covering[gum_mask] > 0.7)
+        ),
+        "outer_annulus_mean_covering": float(np.mean(gum_covering[gum_outer_mask])),
+        "outer_annulus_max_covering": float(np.max(gum_covering[gum_outer_mask])),
+        "clump_em_p95_pc_cm6": float(
+            np.percentile(gum_em_clump[gum_mask] * em_scale, 95.0)
+        ),
+    }
+    orion_mask = angular_mask(nside, 202.0, -38.0, 35.0)
+    orion_screen = {
+        "mean_effective_covering": float(np.mean(orion_covering[orion_mask])),
+        "fraction_covering_above_0p25": float(
+            np.mean(orion_covering[orion_mask] > 0.25)
+        ),
+        "clump_em_p95_pc_cm6": float(
+            np.percentile(orion_em_clump[orion_mask], 95.0)
+        ),
+    }
 
     x, y, z = hp.pix2vec(64, np.arange(hp.nside2npix(64)))
     bubble_pc = 1_000.0 * np.asarray(
@@ -129,9 +159,23 @@ def audit(output_dir: Path) -> dict[str, object]:
     checks = {
         "local_bubble_mean_140_200pc": 140.0 <= bubble["mean"] <= 200.0,
         "local_bubble_has_70_600pc_span": bubble["p05"] <= 120.0 and bubble["p99"] >= 600.0,
-        "gum_bright_em_220_470": 220.0 <= regional_em["gum"]["p95"] <= 470.0,
-        "gum_diffuse_em_present": 8.0 <= regional_em["gum"]["p50"] <= 150.0,
+        "gum_bright_clump_em_150_470": 150.0
+        <= gum_screen["clump_em_p95_pc_cm6"]
+        <= 470.0,
+        "gum_projected_covering_is_coherent": gum_screen[
+            "fraction_covering_above_0p7"
+        ] >= 0.35,
+        "gum_absorption_confined_to_23deg_shell": gum_screen[
+            "outer_annulus_max_covering"
+        ] <= 0.10,
         "orion_em_not_uniform_or_saturated": regional_em["orion_eridanus"]["p95"] < 150.0,
+        "orion_partial_covering_2_5_percent": 0.02
+        <= orion_screen["mean_effective_covering"]
+        <= 0.05,
+        "orion_strong_covering_below_7_percent": orion_screen[
+            "fraction_covering_above_0p25"
+        ]
+        <= 0.07,
         "cygnus_reaches_observed_low_end": regional_em["cygnus_x"]["p50"] >= 1_000.0,
         "shell_map_converged": convergence.get("map_correlation", 0.0) > 0.999,
         "shell_bandpower_converged_through_ell64": abs(convergence.get("bandpower_ratio_31_64", 0.0) - 1.0) < 0.05,
@@ -145,6 +189,8 @@ def audit(output_dir: Path) -> dict[str, object]:
         "checks": checks,
         "local_bubble_pc": bubble,
         "regional_anchor_em_pc_cm6": regional_em,
+        "gum_partial_screen": gum_screen,
+        "orion_partial_screen": orion_screen,
         "loop_catalog": catalog,
         "harmonic": harmonic_checks,
         "shell_resolution_convergence": convergence,

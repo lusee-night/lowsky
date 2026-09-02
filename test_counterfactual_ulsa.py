@@ -10,6 +10,7 @@ from counterfactual_ulsa import (
     exact_ateam_alms,
     local_bubble_boundary_kpc,
     make_local_shell_catalog,
+    make_orion_partial_screens,
     make_random_fields,
     prepare_geometry,
     shell_ray_segments,
@@ -56,6 +57,28 @@ def test_geometry_shape_and_galactic_center_direction():
     assert geometry["radius"].shape == (hp.nside2npix(16), 16)
     gc_pix = hp.ang2pix(16, 0.0, 0.0, lonlat=True)
     assert np.min(geometry["radius"][gc_pix]) < 1.0
+
+
+def test_orion_filaments_are_thin_partial_covering_screens():
+    config = SkyConfig(nside=32, ray_oversample=1, sky_mode="ours")
+    geometry = prepare_geometry(config)
+    emission_measure, covering, distance = make_orion_partial_screens(
+        config, geometry
+    )
+    l_deg, b_deg = geometry["l_deg"], geometry["b_deg"]
+    vectors = np.asarray(hp.ang2vec(l_deg, b_deg, lonlat=True))
+    center = np.asarray(hp.ang2vec(202.0, -38.0, lonlat=True))
+    aperture = np.degrees(
+        np.arccos(np.clip(vectors @ center, -1.0, 1.0))
+    ) < 35.0
+    effective_covering = 1.0 - np.prod(1.0 - covering, axis=0)
+
+    assert emission_measure.shape == (2, hp.nside2npix(32))
+    assert np.max(emission_measure) > 50.0
+    assert np.all((covering >= 0.0) & (covering <= 0.46))
+    assert 0.02 <= np.mean(effective_covering[aperture]) <= 0.05
+    assert np.mean(effective_covering[aperture] > 0.25) <= 0.07
+    assert np.all((distance > 0.0) & (distance < 0.651))
 
 
 def test_source_templates_have_unit_solid_angle_integral():

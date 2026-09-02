@@ -62,9 +62,13 @@ Implementation: the Local Bubble is a low-order irregular radial cavity with
 a mean wall near 170 pc, ordinary directions spanning roughly 70--220 pc, a
 35-pc soft transition, and narrow polar blowouts reaching beyond 600 pc. Gum
 and Orion--Eridanus are broad, ellipsoidal 3D ionized
-interfaces with coherent radius/width variations and soft, incomplete covering;
-Gum includes diffuse tens-of-pc-cm^-6 sight lines and bright sectors in its
-measured 220--470 pc cm^-6 range. Orion--Eridanus uses two overlapping shell
+interfaces integrated on a dedicated 2-pc radial grid. Gum uses the
+Purcell et al. center (l=258 deg, b=-6.6 deg), 450-pc distance, 160-pc radius,
+and 18.5-pc wall. Coherent sectors span roughly 0.2--0.98 projected covering
+at the 2-degree output scale, with the high-covering area comparable to the
+observed clean upper/central shell, and bright sectors in the measured
+220--470 pc cm^-6 range.
+Orion--Eridanus uses two overlapping, much more sparsely covering shell
 pieces across its observed 150--250 pc depth rather than one wall. Cygnus X is
 a degree-scale sub-grid surrogate centered at 1.45 kpc and normalized to the
 low end of its observed 10^3--10^6 pc cm^-6 distribution; its 4.3-pc filaments

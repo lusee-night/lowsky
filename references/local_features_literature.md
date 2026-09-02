@@ -59,3 +59,28 @@ SNRs and from isotropic turbulent fluctuations.
   fade continuously rather than ending at a mask boundary.
 
 These priors define a plausible ensemble, not the actual Milky Way realization.
+
+## Orion--Eridanus ionized screens
+
+Orion--Eridanus is treated differently from the radio-emitting shells above.
+Its H-alpha structure is an elongated roughly 20 by 45 degree collection of
+arcs, while 3-D gas studies favor nested 150--250 pc shells rather than one
+filled spherical wall:
+
+- Pon et al. (2014), filament geometry and 5--13 pc widths:
+  https://academic.oup.com/mnras/article/441/2/1095/1066551
+- Pon et al. (2014), large-scale superbubble geometry:
+  https://academic.oup.com/mnras/article/444/4/3657/1028091
+- Joubaud et al. (2019), nested H I/CO shells:
+  https://arxiv.org/abs/1909.10083
+- Haffner et al. (2003), H-alpha intensity to emission-measure calibration:
+  https://lorenanderson.faculty.wvu.edu/files/d/a208a023-d139-44c4-abe1-9d50c1bbbf0a/haffner_2003_apjs_149_405.pdf
+
+The 5--25 R bright arcs can be optically thick individually at 1 MHz, but that
+does not make a degree-scale pixel an 8000-K black screen. The implementation
+ray-traces 5--12 pc walls on a dedicated 2-pc local grid, retains 0.1--0.45
+sub-beam filling fractions in selected arc pixels, and averages transfer as
+`1 - f + f exp(-tau)`. Its effective coverage is constrained to 2--5 percent
+within the broad 35-degree validation aperture; seven percent is retained only
+as a hard upper envelope motivated by the 1-degree WHAM map:
+https://lambda.gsfc.nasa.gov/product/foreground/fg_wham_h_alpha_map_get.html
