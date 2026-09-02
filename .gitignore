@@ -1,0 +1,21 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+.venv/
+build/
+dist/
+*.egg-info/
+
+# Generated simulations and diagnostics can be hundreds of MB.
+outputs*/
+lowsky-output/
+*.fits
+*.fits.gz
+*.npz
+
+# Locally downloaded literature/source archives.
+references/*.pdf
+references/*.txt
+references/*.tar
+references/arxiv_source/

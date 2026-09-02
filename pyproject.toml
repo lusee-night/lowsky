@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lowsky"
+version = "0.1.0"
+description = "Physics-based counterfactual ultra-low-frequency sky simulations"
+readme = "README.md"
+requires-python = "==3.12.*"
+license = "MIT"
+authors = [{name = "LuSEE Night Collaboration"}]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Science/Research",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering :: Astronomy",
+]
+dependencies = [
+  "astropy",
+  "healpy",
+  "jax",
+  "lusee @ git+https://github.com/lusee-night/luseepy.git@main",
+  "matplotlib",
+  "numpy",
+  "scipy>=1.15",
+]
+
+[project.optional-dependencies]
+dev = ["build", "pytest>=9"]
+
+[project.scripts]
+lowsky-generate = "lowsky.cli:generate"
+lowsky-power = "lowsky.cli:power"
+lowsky-validate = "lowsky.cli:validate"
+
+[project.urls]
+Homepage = "https://github.com/lusee-night/lowsky"
+Repository = "https://github.com/lusee-night/lowsky"
+
+[tool.setuptools]
+packages = ["lowsky"]
+package-dir = {lowsky = "src/lowsky"}
+py-modules = ["counterfactual_ulsa", "plot_harmonic_power", "validate_feature_fidelity"]
+
+[tool.pytest.ini_options]
+testpaths = ["."]
+norecursedirs = ["outputs*", "build", "dist"]
+pythonpath = ["src", "."]
