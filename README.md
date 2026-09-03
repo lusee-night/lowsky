@@ -112,6 +112,21 @@ uv run python examples/plot_harmonic_power.py --help
 uv run python examples/validate_feature_fidelity.py --help
 ```
 
+To test blind A-team spectral recovery over one LuSEE lunar night without the
+receiver/electrical forward model, beam-convolve the canonical source-free and
+source-only harmonics into separate waterfalls:
+
+```bash
+uv run python examples/one_night_source_separation.py \
+  lowsky-output/counterfactual_ulsa_harmonic.npz
+```
+
+The estimator uses known source positions (unit transit templates) and a
+low-order temporal Fourier nuisance model, but never uses the source-free
+waterfall in the fit. The latter is saved only as simulation truth. This is a
+diagnostic identifiability experiment, not yet a receiver-noise or realistic
+beam forecast.
+
 Validation notebooks are in [`notebooks/`](notebooks/), including the
 [`diffuse versus point-source power-spectrum plot`](notebooks/diffuse_vs_point_sources.ipynb).
 The diffuse morphology
