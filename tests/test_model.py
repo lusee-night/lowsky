@@ -10,15 +10,21 @@ def small_inputs() -> SkyInputs:
     return SkyInputs(
         emissivity_408=jnp.full((pixels, distances), 2.0),
         emission_measure_rate=jnp.full((pixels, distances), 0.4),
-        synchrotron_multiplier=jnp.asarray(
-            [[0.9, 1.0, 1.1, 1.2], [1.0, 1.0, 1.0, 1.0], [1.2, 1.1, 1.0, 0.9]]
+        fixed_emission_measure_rate=jnp.zeros((pixels, distances)),
+        synchrotron_random_field=jnp.asarray(
+            [[-1.0, 0.0, 1.0, 0.5], [0.5, -0.5, 1.0, -1.0], [1.0, 0.5, 0.0, -0.5]]
+        ),
+        emission_measure_random_field=jnp.asarray(
+            [[0.5, -0.5, 0.0, 1.0], [0.0, 1.0, -1.0, 0.5], [-0.5, 0.0, 1.0, -1.0]]
         ),
         spectral_index=jnp.asarray([-2.45, -2.55, -2.65]),
+        spectral_index_random_field=jnp.asarray([-1.0, 0.0, 1.0]),
         shell_emission_408=jnp.full((2, 2, pixels), 0.1),
         shell_foreground_emission_measure=jnp.full((2, 2, pixels), 0.3),
         shell_spectral_index=jnp.asarray([-2.7, -2.9]),
         shell_low_frequency_spectral_index=jnp.asarray([-2.5, -2.6]),
         shell_distance_kpc=jnp.full((2, 2, pixels), 0.15),
+        shell_foreground_distance_index=-jnp.ones((2, 2, pixels), dtype=jnp.int32),
         partial_screen_emission_measure=jnp.zeros((1, pixels)),
         partial_screen_covering_fraction=jnp.zeros((1, pixels)),
         partial_screen_distance_kpc=jnp.full((1, pixels), 0.5),
@@ -62,6 +68,29 @@ def test_generate_sky_is_jittable_and_differentiable_in_model_parameters():
     np.testing.assert_allclose(eager, compiled, rtol=1e-6)
     assert np.isfinite(float(gradient))
     assert float(gradient) > 0.0
+
+
+def test_random_realization_amplitudes_and_synchrotron_shape_are_differentiable():
+    frequencies = jnp.asarray([10.0, 30.0])
+    inputs = small_inputs()
+    base = SkyParameters()
+
+    def mean_temperature(values):
+        parameters = base._replace(
+            synchrotron_fluctuation_sigma=values[0],
+            emission_measure_fluctuation_sigma=values[1],
+            spectral_index_fluctuation_sigma=values[2],
+            synchrotron_spectral_curvature=values[3],
+            local_shell_scale=values[4],
+            local_shell_spectral_index_offset=values[5],
+        )
+        return jnp.mean(generate_sky(frequencies, inputs, parameters))
+
+    values = jnp.asarray([0.28, 0.32, 0.055, 0.0, 1.0, 0.0])
+    gradient = jax.jit(jax.grad(mean_temperature))(values)
+
+    assert np.all(np.isfinite(np.asarray(gradient)))
+    assert np.all(np.asarray(gradient) != 0.0)
 
 
 def test_precomputed_additive_components_stay_inside_jax_graph():

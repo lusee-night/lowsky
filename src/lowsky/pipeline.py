@@ -32,6 +32,7 @@ from lusee.SkyModels import HarmonicPointSourceSky
 from .model import (
     SkyInputs,
     SkyParameters,
+    effective_emission_measure_rate,
     optical_depth_coefficient,
     smooth_broken_power_law,
     transfer_frequency,
@@ -55,9 +56,6 @@ class SkyConfig:
     max_distance_kpc: float = 50.0
     seed: int = 20260901
     n_shells: int = 8
-    synch_fluctuation_sigma: float = 0.28
-    em_fluctuation_sigma: float = 0.32
-    beta_fluctuation_sigma: float = 0.055
     output_beam_fwhm_deg: float = 2.0
     harmonic_lmax: int | None = None
     electron_temperature_k: float = 8_000.0
@@ -509,7 +507,6 @@ def physical_fields(
     y: jnp.ndarray,
     z: jnp.ndarray,
     s: jnp.ndarray,
-    em_multiplier: jnp.ndarray,
     local_bubble_radius: float,
     local_bubble_factor: float,
     solar_radius_kpc: float,
@@ -569,7 +566,7 @@ def physical_fields(
     )
     conditioned_local = 1.0 - (1.0 - 0.20) * bubble_inside
     local_factor = (1.0 - conditioned_weight) * spherical_local + conditioned_weight * conditioned_local
-    em_rate = em_rate * local_factor * em_multiplier
+    em_rate = em_rate * local_factor
 
     def center_from_lbd(l_deg: float, b_deg: float, distance: float) -> tuple[jnp.ndarray, jnp.ndarray, jnp.ndarray]:
         ll = jnp.radians(l_deg)
@@ -735,11 +732,10 @@ def make_orion_partial_screens(
     return tuple(value[1:] for value in values)
 
 
-def beta_map(config: SkyConfig, geometry: dict[str, np.ndarray], beta_random: np.ndarray) -> np.ndarray:
+def beta_map(config: SkyConfig, geometry: dict[str, np.ndarray]) -> np.ndarray:
     b = np.radians(geometry["b_deg"])
     # ULSA Fig. 15: plane is shallower, high latitude steeper, south slightly shallower.
     beta = -2.43 - 0.20 * np.abs(np.sin(b)) - 0.035 * np.sin(b)
-    beta += config.beta_fluctuation_sigma * beta_random
     return np.clip(beta, -2.85, -2.25)
 
 
@@ -798,14 +794,23 @@ def transfer_one_frequency(
 
     inputs = SkyInputs(
         emissivity_408=emissivity_408,
-        emission_measure_rate=em_rate,
-        synchrotron_multiplier=synch_multiplier,
+        emission_measure_rate=jnp.zeros_like(em_rate),
+        fixed_emission_measure_rate=em_rate,
+        # The compatibility wrapper receives an already-normalized multiplier.
+        # Encoding log(M)+1/2 with sigma=1 reproduces it exactly in the core.
+        synchrotron_random_field=jnp.log(synch_multiplier) + 0.5,
+        emission_measure_random_field=jnp.zeros_like(em_rate),
         spectral_index=beta,
+        spectral_index_random_field=jnp.zeros_like(beta),
         shell_emission_408=shell_segment_408,
         shell_foreground_emission_measure=shell_foreground_em,
         shell_spectral_index=shell_beta,
         shell_low_frequency_spectral_index=shell_beta_low,
         shell_distance_kpc=jnp.zeros_like(shell_segment_408),
+        # Negative indices select the precomputed compatibility input.
+        shell_foreground_distance_index=-jnp.ones_like(
+            shell_segment_408, dtype=jnp.int32
+        ),
         partial_screen_emission_measure=jnp.zeros(
             (0, emissivity_408.shape[0]), dtype=emissivity_408.dtype
         ),
@@ -825,6 +830,9 @@ def transfer_one_frequency(
         emissivity_scale=emissivity_scale,
         emission_measure_scale=em_scale,
         spectral_index_offset=beta_offset,
+        synchrotron_fluctuation_sigma=1.0,
+        emission_measure_fluctuation_sigma=0.0,
+        spectral_index_fluctuation_sigma=0.0,
         electron_temperature_k=electron_temperature_k,
         shell_spectral_break_mhz=shell_spectral_break_mhz,
         shell_spectral_smoothness=shell_spectral_smoothness,
@@ -1025,17 +1033,15 @@ def prepare_sky(config: SkyConfig) -> PreparedSky:
 
     geometry = prepare_geometry(config)
     random_fields = make_random_fields(config)
-    synchrotron_multiplier = shell_multiplier(
-        random_fields["synch_shells"],
-        geometry["shell_index"],
-        config.synch_fluctuation_sigma,
-    )
-    emission_measure_multiplier = shell_multiplier(
-        random_fields["em_shells"],
-        geometry["shell_index"],
-        config.em_fluctuation_sigma,
-    )
-    spectral_index = beta_map(config, geometry, random_fields["beta"])
+    # Setup chooses one fixed random realization. Continuous amplitudes stay
+    # out of setup and are applied later by the differentiable core.
+    synchrotron_random_field = random_fields["synch_shells"][
+        geometry["shell_index"]
+    ].T
+    emission_measure_random_field = random_fields["em_shells"][
+        geometry["shell_index"]
+    ].T
+    spectral_index = beta_map(config, geometry)
 
     emissivity_408, emission_measure_rate, anchor_emission_measure_rate = physical_fields(
         jnp.asarray(geometry["radius"]),
@@ -1044,7 +1050,6 @@ def prepare_sky(config: SkyConfig) -> PreparedSky:
         jnp.asarray(geometry["y"]),
         jnp.asarray(geometry["z"]),
         jnp.asarray(geometry["s"]),
-        jnp.asarray(emission_measure_multiplier),
         config.local_bubble_radius_kpc,
         config.local_bubble_em_factor,
         config.solar_radius_kpc,
@@ -1056,8 +1061,18 @@ def prepare_sky(config: SkyConfig) -> PreparedSky:
     shell_emission_408, shell_distance_index = shell_ray_segments(
         local_catalog, geometry, config
     )
+    default_parameters = SkyParameters()
+    default_emission_measure_rate = (
+        np.asarray(emission_measure_rate)
+        * np.exp(
+            default_parameters.emission_measure_fluctuation_sigma
+            * emission_measure_random_field
+            - 0.5 * default_parameters.emission_measure_fluctuation_sigma**2
+        )
+        + np.asarray(anchor_emission_measure_rate)
+    )
     cumulative_emission_measure = np.cumsum(
-        np.asarray(emission_measure_rate) * geometry["ds"], axis=1
+        default_emission_measure_rate * geometry["ds"], axis=1
     )
     shell_foreground_emission_measure = cumulative_emission_measure[
         np.arange(cumulative_emission_measure.shape[0])[None, None, :],
@@ -1069,8 +1084,11 @@ def prepare_sky(config: SkyConfig) -> PreparedSky:
     inputs = SkyInputs(
         emissivity_408=emissivity_408,
         emission_measure_rate=emission_measure_rate,
-        synchrotron_multiplier=jnp.asarray(synchrotron_multiplier),
+        fixed_emission_measure_rate=anchor_emission_measure_rate,
+        synchrotron_random_field=jnp.asarray(synchrotron_random_field),
+        emission_measure_random_field=jnp.asarray(emission_measure_random_field),
         spectral_index=jnp.asarray(spectral_index),
+        spectral_index_random_field=jnp.asarray(random_fields["beta"]),
         shell_emission_408=jnp.asarray(shell_emission_408),
         shell_foreground_emission_measure=jnp.asarray(
             shell_foreground_emission_measure
@@ -1080,6 +1098,9 @@ def prepare_sky(config: SkyConfig) -> PreparedSky:
             local_catalog.low_frequency_beta_temperature
         ),
         shell_distance_kpc=jnp.asarray(geometry["s"][shell_distance_index]),
+        shell_foreground_distance_index=jnp.asarray(
+            shell_distance_index, dtype=jnp.int32
+        ),
         partial_screen_emission_measure=jnp.asarray(local_screen_emission_measure),
         partial_screen_covering_fraction=jnp.asarray(local_screen_covering),
         partial_screen_distance_kpc=jnp.asarray(local_screen_distance),
@@ -1117,8 +1138,26 @@ def generate(
     inputs = prepared.inputs
     emissivity_408 = inputs.emissivity_408
     em_rate = inputs.emission_measure_rate
-    synch_multiplier = inputs.synchrotron_multiplier
-    beta = inputs.spectral_index
+    default_parameters = SkyParameters()
+    synch_multiplier = jnp.exp(
+        default_parameters.synchrotron_fluctuation_sigma
+        * inputs.synchrotron_random_field
+        - 0.5 * default_parameters.synchrotron_fluctuation_sigma**2
+    )
+    beta = (
+        inputs.spectral_index
+        + default_parameters.spectral_index_fluctuation_sigma
+        * inputs.spectral_index_random_field
+    )
+    effective_em_rate = (
+        inputs.emission_measure_rate
+        * jnp.exp(
+            default_parameters.emission_measure_fluctuation_sigma
+            * inputs.emission_measure_random_field
+            - 0.5 * default_parameters.emission_measure_fluctuation_sigma**2
+        )
+        + inputs.fixed_emission_measure_rate
+    )
     shell_segment_408_jax = inputs.shell_emission_408
     shell_foreground_em_jax = inputs.shell_foreground_emission_measure
     shell_beta = inputs.shell_spectral_index
@@ -1128,7 +1167,7 @@ def generate(
         mounted_maps,
         anchor_freqs,
         emissivity_408,
-        em_rate,
+        effective_em_rate,
         jnp.asarray(synch_multiplier),
         jnp.asarray(beta),
         shell_segment_408_jax,
@@ -1145,6 +1184,9 @@ def generate(
         emissivity_scale=tuned.emissivity_scale,
         emission_measure_scale=tuned.emission_measure_scale,
         spectral_index_offset=tuned.beta_offset,
+        synchrotron_fluctuation_sigma=default_parameters.synchrotron_fluctuation_sigma,
+        emission_measure_fluctuation_sigma=default_parameters.emission_measure_fluctuation_sigma,
+        spectral_index_fluctuation_sigma=default_parameters.spectral_index_fluctuation_sigma,
         electron_temperature_k=config.electron_temperature_k,
         shell_spectral_break_mhz=config.shell_spectral_break_mhz,
         shell_spectral_smoothness=config.shell_spectral_smoothness,
@@ -1158,6 +1200,7 @@ def generate(
         np.asarray(x) for x in transferred
     ]
     ray_nside = geometry["nside"]
+    em_rate = effective_emission_measure_rate(inputs, parameters)
     lmax = 3 * ray_nside - 1 if config.harmonic_lmax is None else config.harmonic_lmax
     if lmax > 3 * ray_nside - 1:
         raise ValueError(f"harmonic_lmax={lmax} exceeds the NSIDE={ray_nside} sampling limit")

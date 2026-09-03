@@ -50,6 +50,12 @@ parameters = SkyParameters(
     emissivity_scale=1.0,
     emission_measure_scale=1.0,
     spectral_index_offset=0.0,
+    synchrotron_fluctuation_sigma=0.28,
+    emission_measure_fluctuation_sigma=0.32,
+    spectral_index_fluctuation_sigma=0.055,
+    synchrotron_spectral_curvature=0.0,
+    local_shell_scale=1.0,
+    local_shell_spectral_index_offset=0.0,
 )
 
 frequencies_mhz = jnp.array([1.0, 10.0, 30.0, 50.0])
@@ -59,6 +65,10 @@ sky_k = jax.jit(generate_sky)(frequencies_mhz, inputs, parameters)
 `SkyInputs` and `SkyParameters` are JAX pytrees. The output can be used with
 `jax.jit`, `jax.grad`, `jax.jacfwd`, and `jax.vmap`. Use
 `generate_sky_components` when individual physical components are needed.
+The setup step fixes geometry, catalogs, and unit random fields from `seed`;
+the amplitudes of those fields and the synchrotron spectral parameters remain
+continuous `SkyParameters`, so one realization can be optimized or sampled
+without rerunning setup.
 
 ## ULSA drop-in file
 

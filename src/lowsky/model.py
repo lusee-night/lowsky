@@ -20,8 +20,9 @@ MHZ_TO_GHZ = 1.0e-3
 class SkyInputs(NamedTuple):
     """Prepared spatial fields consumed by the differentiable model.
 
-    The first three fields have shape ``(pixel, distance)``. ``spectral_index``
-    has shape ``(pixel,)``. Radio-shell arrays have shape
+    The volume fields and their unit random realizations have shape
+    ``(pixel, distance)``. ``spectral_index`` and its unit random realization
+    have shape ``(pixel,)``. Radio-shell arrays have shape
     ``(shell, distance_bin, pixel)``. Partial ionized screens have shape
     ``(screen, pixel)``; their covering fractions are beam-area fractions,
     not factors multiplying emission measure.
@@ -29,13 +30,17 @@ class SkyInputs(NamedTuple):
 
     emissivity_408: jax.Array
     emission_measure_rate: jax.Array
-    synchrotron_multiplier: jax.Array
+    fixed_emission_measure_rate: jax.Array
+    synchrotron_random_field: jax.Array
+    emission_measure_random_field: jax.Array
     spectral_index: jax.Array
+    spectral_index_random_field: jax.Array
     shell_emission_408: jax.Array
     shell_foreground_emission_measure: jax.Array
     shell_spectral_index: jax.Array
     shell_low_frequency_spectral_index: jax.Array
     shell_distance_kpc: jax.Array
+    shell_foreground_distance_index: jax.Array
     partial_screen_emission_measure: jax.Array
     partial_screen_covering_fraction: jax.Array
     partial_screen_distance_kpc: jax.Array
@@ -49,6 +54,12 @@ class SkyParameters(NamedTuple):
     emissivity_scale: jax.Array | float = 1.0
     emission_measure_scale: jax.Array | float = 1.0
     spectral_index_offset: jax.Array | float = 0.0
+    synchrotron_fluctuation_sigma: jax.Array | float = 0.28
+    emission_measure_fluctuation_sigma: jax.Array | float = 0.32
+    spectral_index_fluctuation_sigma: jax.Array | float = 0.055
+    synchrotron_spectral_curvature: jax.Array | float = 0.0
+    local_shell_scale: jax.Array | float = 1.0
+    local_shell_spectral_index_offset: jax.Array | float = 0.0
     electron_temperature_k: jax.Array | float = 8_000.0
     shell_spectral_break_mhz: jax.Array | float = 30.0
     shell_spectral_smoothness: jax.Array | float = 2.0
@@ -63,6 +74,33 @@ class SkyComponents(NamedTuple):
     local_shells: jax.Array
     free_free: jax.Array
     extragalactic: jax.Array
+
+
+def _unit_field_multiplier(field: jax.Array, sigma: jax.Array | float) -> jax.Array:
+    """Turn a fixed unit-normal realization into a differentiable lognormal field."""
+
+    sigma = jnp.asarray(sigma)
+    return jnp.exp(sigma * field - 0.5 * sigma**2)
+
+
+def effective_emission_measure_rate(
+    inputs: SkyInputs,
+    parameters: SkyParameters,
+) -> jax.Array:
+    """Return the differentiably modulated volume EM rate.
+
+    Named sub-grid structures such as Cygnus X live in the fixed term so that
+    changing the diffuse-WIM fluctuation amplitude does not also rescale them.
+    """
+
+    return (
+        inputs.emission_measure_rate
+        * _unit_field_multiplier(
+            inputs.emission_measure_random_field,
+            parameters.emission_measure_fluctuation_sigma,
+        )
+        + inputs.fixed_emission_measure_rate
+    )
 
 
 def optical_depth_coefficient(
@@ -108,7 +146,7 @@ def transfer_frequency(
     """Evaluate radiative transfer at one frequency using only JAX operations."""
 
     differential_em = (
-        inputs.emission_measure_rate
+        effective_emission_measure_rate(inputs, parameters)
         * parameters.emission_measure_scale
         * inputs.distance_step_kpc
     )
@@ -147,8 +185,17 @@ def transfer_frequency(
         axis=0,
     )
 
-    spectral_index = inputs.spectral_index + parameters.spectral_index_offset
-    frequency_scale = (frequency_mhz / 408.0) ** spectral_index
+    spectral_index = (
+        inputs.spectral_index
+        + parameters.spectral_index_fluctuation_sigma
+        * inputs.spectral_index_random_field
+        + parameters.spectral_index_offset
+    )
+    log_frequency_ratio = jnp.log(frequency_mhz / 408.0)
+    frequency_scale = jnp.exp(
+        spectral_index * log_frequency_ratio
+        + parameters.synchrotron_spectral_curvature * log_frequency_ratio**2
+    )
     base_emission = (
         inputs.emissivity_408
         * parameters.emissivity_scale
@@ -160,7 +207,10 @@ def transfer_frequency(
     )
     stochastic_synchrotron = jnp.sum(
         base_emission
-        * inputs.synchrotron_multiplier
+        * _unit_field_multiplier(
+            inputs.synchrotron_random_field,
+            parameters.synchrotron_fluctuation_sigma,
+        )
         * attenuation
         * inputs.distance_step_kpc,
         axis=1,
@@ -179,8 +229,14 @@ def transfer_frequency(
 
     shell_scale = smooth_broken_power_law(
         frequency_mhz,
-        inputs.shell_spectral_index[:, None, None],
-        inputs.shell_low_frequency_spectral_index[:, None, None],
+        (
+            inputs.shell_spectral_index
+            + parameters.local_shell_spectral_index_offset
+        )[:, None, None],
+        (
+            inputs.shell_low_frequency_spectral_index
+            + parameters.local_shell_spectral_index_offset
+        )[:, None, None],
         parameters.shell_spectral_break_mhz,
         parameters.shell_spectral_smoothness,
     )
@@ -196,14 +252,26 @@ def transfer_frequency(
         ),
         axis=0,
     )
+    shell_foreground_index = inputs.shell_foreground_distance_index
+    dynamic_shell_foreground_em = jnp.take_along_axis(
+        cumulative_em_edge[None, None, :, :],
+        jnp.maximum(shell_foreground_index, 0)[:, :, :, None],
+        axis=3,
+    )[..., 0]
+    shell_foreground_em = jnp.where(
+        shell_foreground_index >= 0,
+        dynamic_shell_foreground_em,
+        parameters.emission_measure_scale
+        * inputs.shell_foreground_emission_measure,
+    )
     local_shells = jnp.sum(
-        inputs.shell_emission_408
+        parameters.local_shell_scale
+        * inputs.shell_emission_408
         * shell_scale
         * radio_shell_partial_transmission
         * jnp.exp(
             -tau_coefficient
-            * parameters.emission_measure_scale
-            * inputs.shell_foreground_emission_measure
+            * shell_foreground_em
         ),
         axis=(0, 1),
     )
@@ -259,6 +327,7 @@ __all__ = [
     "SkyComponents",
     "SkyInputs",
     "SkyParameters",
+    "effective_emission_measure_rate",
     "generate_sky",
     "generate_sky_components",
     "optical_depth_coefficient",
