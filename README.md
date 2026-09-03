@@ -130,7 +130,9 @@ channels); no single-port beam rotations are synthesized. The estimator uses
 known source positions and an independent low-order temporal Fourier nuisance
 model for each channel, but never uses the source-free waterfall in the fit.
 Moon and antenna thermal emission are disabled so the saved diffuse-only and
-source-only component waterfalls are strictly additive.
+source-only component waterfalls are strictly additive. The default
+``lmax=179`` is the native harmonic ceiling of the V16 response and preserves
+the modeled lunar-horizon edge at approximately its one-degree grid scale.
 
 Validation notebooks are in [`notebooks/`](notebooks/), including the
 [`diffuse versus point-source power-spectrum plot`](notebooks/diffuse_vs_point_sources.ipynb).

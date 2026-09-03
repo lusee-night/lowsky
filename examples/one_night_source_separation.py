@@ -153,7 +153,12 @@ def main() -> None:
     parser.add_argument("--cadence-hours", type=float, default=2.0)
     parser.add_argument("--frequency-min", type=float, default=5.0)
     parser.add_argument("--frequency-max", type=float, default=50.0)
-    parser.add_argument("--lmax", type=int, default=32)
+    parser.add_argument(
+        "--lmax",
+        type=int,
+        default=179,
+        help="harmonic cutoff; 179 is the native limit of the V16 response",
+    )
     parser.add_argument(
         "--response-file",
         type=Path,
@@ -252,6 +257,8 @@ def main() -> None:
         "utc_start": str(obs.times[0].isot),
         "utc_end": str(obs.times[-1].isot),
         "samples": int(len(obs.times)),
+        "cadence_hours": args.cadence_hours,
+        "lmax": args.lmax,
         "response_file": str(response_file.resolve()),
         "response_content_hash": response.content_hash,
         "response_simulation": str(response.header.get("SIMULATION", "unknown")),
