@@ -33,3 +33,18 @@ def test_recover_spectra_ignores_unknown_fourier_foreground():
     np.testing.assert_allclose(recovered, truth, rtol=1e-11, atol=1e-11)
     np.testing.assert_allclose(reconstructed, np.einsum("stf,sf->tf", templates, truth))
     assert np.all(np.isfinite(condition))
+
+
+def test_recover_spectra_combines_multiple_channels():
+    rng = np.random.default_rng(3)
+    nt, nc, nf, ns = 45, 4, 3, 2
+    templates = rng.normal(size=(ns, nt, nc, nf))
+    truth = rng.uniform(1, 3, size=(ns, nf))
+    nuisance = fourier_nuisance_basis(nt, 2)
+    foreground = np.einsum("tk,kcf->tcf", nuisance,
+                            rng.normal(size=(nuisance.shape[1], nc, nf)))
+    total = foreground + np.einsum("stcf,sf->tcf", templates, truth)
+    recovered, reconstructed, condition = recover_spectra(total, templates, 2)
+    np.testing.assert_allclose(recovered, truth, rtol=1e-11, atol=1e-11)
+    np.testing.assert_allclose(reconstructed, np.einsum("stcf,sf->tcf", templates, truth))
+    assert np.all(np.isfinite(condition))

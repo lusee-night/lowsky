@@ -121,11 +121,16 @@ uv run python examples/one_night_source_separation.py \
   lowsky-output/counterfactual_ulsa_harmonic.npz
 ```
 
-The estimator uses known source positions (unit transit templates) and a
-low-order temporal Fourier nuisance model, but never uses the source-free
-waterfall in the fit. The latter is saved only as simulation truth. This is a
-diagnostic identifiability experiment, not yet a receiver-noise or realistic
-beam forecast.
+This uses the generated, validated four-port response
+``/local/zack/receive_matrix/lusee_bgl_v16_response_v3.fits`` (or the file
+passed with ``--response-file``) directly. Its port-specific complex effective
+lengths, mutual impedance, layered-regolith/lander response, and JFET receiver
+loading produce all 4 auto-power plus 6 complex cross-power products (16 real
+channels); no single-port beam rotations are synthesized. The estimator uses
+known source positions and an independent low-order temporal Fourier nuisance
+model for each channel, but never uses the source-free waterfall in the fit.
+Moon and antenna thermal emission are disabled so the saved diffuse-only and
+source-only component waterfalls are strictly additive.
 
 Validation notebooks are in [`notebooks/`](notebooks/), including the
 [`diffuse versus point-source power-spectrum plot`](notebooks/diffuse_vs_point_sources.ipynb).

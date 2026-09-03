@@ -1,9 +1,10 @@
 """One-lunar-night point-source separation experiment with Lowsky + LuSEEpy.
 
-This stops before the electrical/receiver forward model. It beam-convolves the
-canonical Lowsky harmonics, saves diffuse-only and source-only waterfalls, and
-fits free source spectra using known transit templates plus an unknown smooth
-temporal foreground. The diffuse-only waterfall is used only to score the fit.
+This contracts the canonical Lowsky harmonics with the generated four-port
+instrument response, applies receiver loading, saves diffuse-only and
+source-only waterfalls, and fits free source spectra using known transit
+templates plus an unknown smooth temporal foreground. The diffuse-only
+waterfall is used only to score the fit.
 """
 
 from __future__ import annotations
@@ -14,6 +15,7 @@ import os
 from pathlib import Path
 
 os.environ.setdefault("JAX_ENABLE_X64", "1")
+os.environ.setdefault("XLA_PYTHON_CLIENT_PREALLOCATE", "false")
 
 import jax.numpy as jnp
 import healpy as hp
@@ -60,8 +62,13 @@ def fourier_nuisance_basis(nt: int, max_mode: int) -> np.ndarray:
 
 
 def recover_spectra(total_waterfall, unit_source_templates, foreground_modes):
-    """Fit source amplitudes per channel after Fourier nuisance projection."""
-    nt, nf = total_waterfall.shape
+    """Fit common source spectra across channels after per-channel projection."""
+    total_waterfall = np.asarray(total_waterfall)
+    unit_source_templates = np.asarray(unit_source_templates)
+    if total_waterfall.ndim == 2:
+        total_waterfall = total_waterfall[:, None, :]
+        unit_source_templates = unit_source_templates[:, :, None, :]
+    nt, nc, nf = total_waterfall.shape
     ns = unit_source_templates.shape[0]
     nuisance = fourier_nuisance_basis(nt, foreground_modes)
     projector = np.eye(nt) - nuisance @ nuisance.T
@@ -69,34 +76,58 @@ def recover_spectra(total_waterfall, unit_source_templates, foreground_modes):
     condition = np.empty(nf)
     reconstructed = np.empty_like(total_waterfall)
     for fi in range(nf):
-        design = projector @ unit_source_templates[:, :, fi].T
-        target = projector @ total_waterfall[:, fi]
+        # Each channel gets its own arbitrary low-order foreground coefficients,
+        # while a source has one shared spectral amplitude across all channels.
+        design = np.einsum(
+            "tu,suc->tcs", projector, unit_source_templates[:, :, :, fi]
+        )
+        target = np.einsum("tu,uc->tc", projector, total_waterfall[:, :, fi])
+        design = design.reshape(nt * nc, ns)
+        target = target.reshape(nt * nc)
         amplitudes[:, fi], *_ = np.linalg.lstsq(design, target, rcond=1e-10)
         condition[fi] = np.linalg.cond(design)
-        reconstructed[:, fi] = unit_source_templates[:, :, fi].T @ amplitudes[:, fi]
+        reconstructed[:, :, fi] = np.einsum(
+            "stc,s->tc", unit_source_templates[:, :, :, fi], amplitudes[:, fi]
+        )
+    if nc == 1:
+        reconstructed = reconstructed[:, 0, :]
     return amplitudes, reconstructed, condition
 
 
 def fft_power(waterfall: np.ndarray) -> np.ndarray:
+    if waterfall.ndim == 3:
+        waterfall = np.sqrt(np.mean(np.abs(waterfall) ** 2, axis=1))
     centered = waterfall - waterfall.mean(axis=0, keepdims=True)
     return np.abs(np.fft.rfft(centered, axis=0).T) ** 2
 
 
 def simulate(simulator, sky: HarmonicCubeSky) -> np.ndarray:
-    return np.asarray(simulator.simulate(sky=sky))[:, 0, :]
+    return np.asarray(simulator.simulate(sky=sky))
 
 
 def make_summary_figure(output: Path, data: dict, metrics: dict) -> None:
     freq, hours = data["frequency_mhz"], data["elapsed_hours"]
-    diffuse, sources = data["diffuse_waterfall_k"], data["source_waterfall_k"]
+    diffuse = data["diffuse_waterfall_v2_per_hz"]
+    sources = data["source_waterfall_v2_per_hz"]
+    diffuse_display = np.sqrt(np.mean(np.abs(diffuse) ** 2, axis=1))
+    source_display = np.sqrt(np.mean(np.abs(sources) ** 2, axis=1))
     truth, fit = data["true_source_spectra_k_sr"], data["recovered_source_spectra_k_sr"]
     fig, axes = plt.subplots(2, 2, figsize=(13, 8), constrained_layout=True)
     for ax, image, title in (
-        (axes[0, 0], diffuse, "Diffuse sky (source-free truth)"),
-        (axes[0, 1], sources, "A-team sources (truth)"),
+        (axes[0, 0], diffuse_display, "Diffuse sky (channel RMS)"),
+        (axes[0, 1], source_display, "A-team sources (channel RMS)"),
     ):
-        im = ax.pcolormesh(freq, hours / 24, np.log10(np.maximum(image, 1e-12)), shading="auto")
-        ax.set(xlabel="Frequency [MHz]", ylabel="Elapsed days", title=title + " — log10 K")
+        im = ax.pcolormesh(
+            freq,
+            hours / 24,
+            np.log10(np.maximum(image, np.finfo(float).tiny)),
+            shading="auto",
+        )
+        ax.set(
+            xlabel="Frequency [MHz]",
+            ylabel="Elapsed days",
+            title=title + " — log10(V²/Hz)",
+        )
         fig.colorbar(im, ax=ax)
     ratio = fft_power(sources) / np.maximum(fft_power(diffuse), np.finfo(float).tiny)
     im = axes[1, 0].pcolormesh(np.arange(ratio.shape[1]), freq,
@@ -123,7 +154,14 @@ def main() -> None:
     parser.add_argument("--frequency-min", type=float, default=5.0)
     parser.add_argument("--frequency-max", type=float, default=50.0)
     parser.add_argument("--lmax", type=int, default=32)
-    parser.add_argument("--beam-sigma-deg", type=float, default=45.0)
+    parser.add_argument(
+        "--response-file",
+        type=Path,
+        help=(
+            "validated four-port InstrumentResponse FITS; defaults to "
+            "$LUSEE_RESPONSE_FILE or the local generated V16 product"
+        ),
+    )
     parser.add_argument("--foreground-modes", type=int, default=4)
     args = parser.parse_args()
     args.output_dir.mkdir(parents=True, exist_ok=True)
@@ -147,20 +185,51 @@ def main() -> None:
     if not np.any(night) or not np.all(np.diff(np.flatnonzero(night)) == 1):
         raise RuntimeError("could not identify one contiguous local lunar night")
     obs.times = obs.times[night]
-    beam = lusee.BeamGauss(alt_deg=90, az_deg=0, sigma_deg=args.beam_sigma_deg,
-                           one_over_freq_scaling=False, freq_min=float(freq[0]),
-                           freq_max=float(freq[-1]), Nfreq=len(freq), id="diagnostic_zenith")
-    simulator = lusee.CroSimulator(obs, [beam], sky("no_sources"), Tground=0,
-                                   combinations=[(0, 0)], freq=freq, lmax=args.lmax)
+    response_file = args.response_file
+    if response_file is None and os.environ.get("LUSEE_RESPONSE_FILE"):
+        response_file = Path(os.environ["LUSEE_RESPONSE_FILE"])
+    if response_file is None:
+        candidate = Path("/local/zack/receive_matrix/lusee_bgl_v16_response_v3.fits")
+        if candidate.exists():
+            response_file = candidate
+    if response_file is None or not response_file.exists():
+        raise FileNotFoundError(
+            "pass --response-file or set LUSEE_RESPONSE_FILE to a validated "
+            "four-port response FITS"
+        )
+    response = lusee.InstrumentResponse(response_file, require_validated=True)
+    receiver = lusee.receiver_from_config({"model": "jfet"})
+    # Component waterfalls must be strictly additive. The generated response
+    # still supplies the coherent layered-regolith/lander response, while
+    # thermal Moon and antenna emission are intentionally excluded here.
+    simulator = lusee.FullStokesCroSimulator(
+        obs,
+        response,
+        sky("no_sources"),
+        receiver,
+        T_moon=0.0,
+        T_ant=0.0,
+        products="all",
+        freq=freq,
+        lmax=args.lmax,
+    )
 
     print("Simulating source-free and A-team waterfalls...")
-    diffuse, sources = simulate(simulator, sky("no_sources")), simulate(simulator, sky("ateam"))
+    diffuse = simulate(simulator, sky("no_sources"))
+    channel_labels = tuple(simulator.product_labels)
+    port_names = tuple(str(response.header["PORTNAMES"]).split(","))
+    channel_names = [
+        f"{port_names[int(label[0])]}{port_names[int(label[1])]}_"
+        f"{'real' if label[2] == 'R' else 'imag'}"
+        for label in channel_labels
+    ]
+    sources = simulate(simulator, sky("ateam"))
     total = diffuse + sources
     print("Simulating four known-location source templates...")
     individual = np.stack([simulate(simulator, sky(key)) for key in SOURCE_KEYS])
     source_alms = np.stack([truncate_alms(product[key][select], args.lmax) for key in SOURCE_KEYS])
     truth = np.real(source_alms[:, :, 0]) * np.sqrt(4 * np.pi)
-    unit_templates = individual / truth[:, None, :]
+    unit_templates = individual / truth[:, None, None, :]
     recovered, reconstructed, condition = recover_spectra(total, unit_templates, args.foreground_modes)
     fractional_error = (recovered - truth) / truth
     mode_scan = {}
@@ -183,20 +252,27 @@ def main() -> None:
         "utc_start": str(obs.times[0].isot),
         "utc_end": str(obs.times[-1].isot),
         "samples": int(len(obs.times)),
+        "response_file": str(response_file.resolve()),
+        "response_content_hash": response.content_hash,
+        "response_simulation": str(response.header.get("SIMULATION", "unknown")),
+        "receiver_model": type(receiver).__name__,
+        "thermal_moon_and_antenna_included": False,
+        "channels": channel_names,
         "foreground_mode_scan": mode_scan,
     }
     output = {
         "frequency_mhz": freq,
         "elapsed_hours": np.arange(len(obs.times)) * obs.deltaT_sec / 3600,
-        "diffuse_waterfall_k": diffuse,
-        "source_waterfall_k": sources,
-        "total_waterfall_k": total,
-        "individual_source_waterfalls_k": individual,
-        "unit_source_templates_k_per_k_sr": unit_templates,
+        "diffuse_waterfall_v2_per_hz": diffuse,
+        "source_waterfall_v2_per_hz": sources,
+        "total_waterfall_v2_per_hz": total,
+        "individual_source_waterfalls_v2_per_hz": individual,
+        "unit_source_templates_v2_per_hz_per_k_sr": unit_templates,
         "true_source_spectra_k_sr": truth,
         "recovered_source_spectra_k_sr": recovered,
-        "reconstructed_source_waterfall_k": reconstructed,
+        "reconstructed_source_waterfall_v2_per_hz": reconstructed,
         "source_names": np.asarray([key.removeprefix("ateam_") for key in SOURCE_KEYS]),
+        "channel_names": np.asarray(channel_names),
         "design_condition_number": condition,
         "fractional_error": fractional_error,
     }
