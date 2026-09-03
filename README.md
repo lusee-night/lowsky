@@ -63,14 +63,14 @@ sky_k = jax.jit(generate_sky)(frequencies_mhz, inputs, parameters)
 ## ULSA drop-in file
 
 Download the calibrated 1--50 MHz NSIDE-32 replacement from the
-[latest release](https://github.com/lusee-night/lowsky/releases/latest/download/ULSA_32_ddi_smooth.fits),
+[latest release](https://github.com/lusee-night/lowsky/releases/latest/download/lowsky_32.fits),
 or generate a new realization locally without reading the mounted ULSA
 artifact:
 
 ```bash
 uv run python examples/export_ulsa_dropin.py \
   --sky-mode ours \
-  --output ULSA_32_ddi_smooth.fits
+  --output lowsky_32.fits
 ```
 
 The writer enforces the LuSEEpy contract: one float64 primary HDU containing
@@ -102,7 +102,9 @@ uv run python examples/plot_harmonic_power.py --help
 uv run python examples/validate_feature_fidelity.py --help
 ```
 
-Validation notebooks are in [`notebooks/`](notebooks/). The diffuse morphology
+Validation notebooks are in [`notebooks/`](notebooks/), including the
+[`diffuse versus point-source power-spectrum plot`](notebooks/diffuse_vs_point_sources.ipynb).
+The diffuse morphology
 has been resolution-validated through `ell = 64`; higher multipoles are retained
 but should not be interpreted as converged small-scale structure.
 

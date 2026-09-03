@@ -2,7 +2,7 @@
 
 Example
 -------
-python examples/export_ulsa_dropin.py --output ULSA_32_ddi_smooth.fits
+python examples/export_ulsa_dropin.py --output lowsky_32.fits
 """
 
 from __future__ import annotations
@@ -20,8 +20,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--output",
         type=Path,
-        default=Path("ULSA_32_ddi_smooth.fits"),
-        help="Drop-in FITS path (default: ULSA_32_ddi_smooth.fits).",
+        default=Path("lowsky_32.fits"),
+        help="Drop-in FITS path (default: lowsky_32.fits).",
     )
     parser.add_argument("--seed", type=int, default=SkyConfig.seed)
     parser.add_argument("--n-distance", type=int, default=SkyConfig.n_distance)
