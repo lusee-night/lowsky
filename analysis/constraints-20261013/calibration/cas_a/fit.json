@@ -1,0 +1,32 @@
+{
+  "target": {
+    "source": "https://arxiv.org/html/2312.09764",
+    "epoch": "2023.5",
+    "kind": "same-spectrum fit-derived peak location and amplitude; correlated summaries, calibration target",
+    "peak_frequency_mhz": 21.5,
+    "frequency_reported_pm_mhz": 0.2,
+    "peak_flux_jy": 29880.0,
+    "flux_reported_pm_jy": 2980
+  },
+  "model": {
+    "fixed_alpha": -0.77,
+    "old_s50_jy": 27104.0,
+    "old_tau10": 0.35,
+    "new_s50_jy": 21166.462683550057,
+    "new_tau10": 1.808357948129924,
+    "foreground_tau_at_50mhz": 0.0007285395013076285,
+    "foreground_inference": "from canonical source a00 at 50 MHz and old S50; assumes saved artifact source formula and current alpha/tau match"
+  },
+  "artifact": {
+    "path": "outputs_our_sky_gum_gaussian_final/counterfactual_ulsa_harmonic.npz",
+    "sha256": "7fd820c5784531498249b386dc762d2ecfd23efbb5a038dae7817b431085d7b4",
+    "source_revision_verified": false
+  },
+  "method": "Solve derivative d log S / d log nu=0 at 21.5 MHz and S(21.5)=29880 Jy for s50,tau10; fixed alpha=-0.77, foreground tau scales nu^-2.1. Conditional calibration, not independent validation.",
+  "limits": [
+    "No epoch/fading model",
+    "LWA1 35-50 ratios reserved as diagnostic, not fit",
+    "LOFAR published 50-MHz S50 is imposed flux model, not direct holdout",
+    "Full-source exponential does not represent Cas A front/back partial covering"
+  ]
+}

@@ -9,11 +9,44 @@ Haslam or ULSA.
 The 1 MHz morphology is especially prior-sensitive because even modest ionized
 filaments become optically thick; isolated dark patches are not robust pixels.
 
-The model includes synchrotron emission, free-free transfer, spiral structure,
-the Local Bubble, nearby shells and spurs, Gum, Orion–Eridanus, Cygnus X, an
-isotropic extragalactic background, and optional analytic A-team sources.
-Diffuse WIM and Galactic-center absorption are volume-filling. Thin nearby
-ionized filaments use explicit sub-beam partial-covering transfer.
+## What is in the model?
+
+The sky combines a smooth Galactic background, a small set of extended
+objects, and bright point sources. In the Milky-Way-conditioned realization:
+
+| Component | Representation |
+|---|---|
+| **Bright sources** | Cas A, Cyg A, Tau A, and Vir A as analytic point-source `a_lm` coefficients, with flux spectra and low-frequency turnover. |
+| **Galactic synchrotron** | A smooth disk with approximate spiral arms and a central bar, plus correlated texture. |
+| **Radio loops** | Five broad emitting shells representing Loop I S1/S2 and Loops II–IV, with broken-power-law spectra. |
+| **Local ionized structures** | A Gaussian Gum blob, two Orion–Eridanus interfaces, a Gaussian Cygnus complex, and a Local Bubble cavity. |
+| **Diffuse absorbing gas** | NE2001-inspired thick/thin disks, arms, and Galactic center, represented through effective emission measure. |
+| **Radio background** | An initially isotropic power-law background, attenuated through the Galaxy. |
+
+Free-free absorption is integrated along each line of sight, so foreground
+gas attenuates emission behind it and contributes its own thermal emission.
+Unresolved local screens have partial covering. Extended emission is
+transformed into spherical harmonics; point sources have analytic harmonics.
+The usual 2-degree-beam maps are diagnostic views of those components.
+
+**What is fitted?** The physical realization's overall emissivity, spectral
+offset, and emission-measure scale are tuned to ULSA's mean spectrum. Cas A's
+normalization and turnover are now calibrated to its 2023.5 fitted peak.
+Most object geometries and remaining spectra are prescribed from literature
+or sampled from stated priors, rather than jointly fitted to all measurements.
+
+A separate **survey-calibrated diffuse map** fits 48 broad Gaussian basis
+functions at 10.03, 22, and 45 MHz to rescale the volume synchrotron and radio
+background together. It preserves shells and absorption physics. This is an
+empirical brightness correction; comparisons with those surveys are calibration
+checks. Outside 10.03–45 MHz its correction is extrapolated. This map retains
+the saved historical point sources and is not yet a unified harmonic product
+with the updated Cas A prescription.
+
+The design rule is to keep geometry simple and fit a small number of amplitudes,
+spectral parameters, and optical depths where measurements constrain them.
+See the [model inventory](docs/model_inventory.md) for implementation details
+and the distinction between fitted parameters and prescribed structure.
 
 ## Install
 
@@ -146,3 +179,44 @@ This is a controlled simulator, not an observational survey. It uses ULSA’s
 radiative-transfer ingredients and global calibration while deliberately
 avoiding a Haslam residual template. See [`references/`](references/) for the
 physical anchors and literature notes.
+
+## Observational evidence and comparison plots
+
+The [Cas A calibration](analysis/constraints-20261013/calibration/cas_a/README.md)
+sets the pipeline source prescription to the 2023.5 fitted turnover
+(21.5 MHz, 29.88 kJy), conditional on the saved foreground and spectral slope.
+The [survey-conditioned diffuse realization](analysis/constraints-20261013/calibration/diffuse_survey_conditioned/README.md)
+is a separate empirical map product; generate it with
+[`examples/calibrate_diffuse_surveys.py`](examples/calibrate_diffuse_surveys.py).
+Its manifest records fitted coefficients, spatial-check residuals, and input
+hashes. Physical defaults and original saved simulations are preserved.
+Earlier rejected physical-parameter trials remain in the
+[diagnostic record](analysis/constraints-20261013/calibration/diffuse/README.md).
+
+The [full evidence index](evidence/README.md) brings together the historical
+spectra, modern spacecraft measurements, radio surveys, HII-region data, and
+object-specific constraints gathered in October 2026. It records measurement
+definitions, calibration ancestry, derived quantities, duplicate entries, and
+the work needed before each dataset can be compared with lowsky. An index entry
+does not imply an independent measurement or a successful model validation.
+
+From a source checkout:
+
+```bash
+JAX_PLATFORMS=cpu uv run python -m lowsky.evidence summary
+JAX_PLATFORMS=cpu uv run python -m lowsky.evidence list
+uv run python examples/compare_evidence.py
+```
+
+The comparison command uses the locally saved
+`outputs_our_sky_gum_gaussian_final/` realization and the acquired survey maps;
+these generated/binary files are not distributed in Git. Each plot records
+its inputs and hashes. See the [comparison guide](docs/evidence_comparisons.md)
+for input requirements, commands and interpretation, including why the existing
+realization is an illustrative baseline rather than a newly calibrated fit.
+
+The figures show the usable overlap of model and data, not a certified region
+of correctness. The saved model covers 1–50 MHz, with documented diffuse
+angular convergence through ell=64. Observation operators, calibration
+uncertainties and source epochs impose further limits. Discrepancies remain
+visible rather than being removed by selecting only agreeing observations.

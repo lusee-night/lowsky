@@ -1,0 +1,108 @@
+{
+  "kind": "model_assumptions_not_observations",
+  "source_path": "src/lowsky/pipeline.py",
+  "source_sha256": "2f3c395a4c94223dd4914ca01ed94d0dda8c19fe0a602c5affc331b80a426bc6",
+  "shell_catalog_path": "outputs_our_sky_gum_gaussian_final/local_shell_catalog.json",
+  "shell_catalog_sha256": "09c94caa0d34be68943149599cfdd2f21264363d17aa6e6f99072fccfa1709c1",
+  "spectral_convention": "Stored loop indices are signed exponents T proportional to nu^index. Flux source indices are signed S_nu exponents.",
+  "bright_sources": [
+    {
+      "name": "CAS_A",
+      "galactic_l_deg": 111.7376,
+      "galactic_b_deg": -2.1345,
+      "nominal_s50_jy_before_galactic_absorption": 27104.0,
+      "flux_spectral_index": -0.77,
+      "distance_kpc_null_means_extragalactic": 3.4,
+      "phenomenological_tau10": 0.35
+    },
+    {
+      "name": "CYG_A",
+      "galactic_l_deg": 76.1899,
+      "galactic_b_deg": 5.7554,
+      "nominal_s50_jy_before_galactic_absorption": 22146.0,
+      "flux_spectral_index": -0.78,
+      "distance_kpc_null_means_extragalactic": null,
+      "phenomenological_tau10": 0.08
+    },
+    {
+      "name": "TAU_A",
+      "galactic_l_deg": 184.5547,
+      "galactic_b_deg": -5.7833,
+      "nominal_s50_jy_before_galactic_absorption": 2008.0,
+      "flux_spectral_index": -0.27,
+      "distance_kpc_null_means_extragalactic": 2.0,
+      "phenomenological_tau10": 0.12
+    },
+    {
+      "name": "VIR_A",
+      "galactic_l_deg": 283.7778,
+      "galactic_b_deg": 74.4912,
+      "nominal_s50_jy_before_galactic_absorption": 2635.0,
+      "flux_spectral_index": -0.85,
+      "distance_kpc_null_means_extragalactic": null,
+      "phenomenological_tau10": 0.04
+    }
+  ],
+  "realized_shells": [
+    {
+      "name": "LOOP_I_S1",
+      "center_l_deg": 345.9720145423625,
+      "center_b_deg": 2.5081441399192634,
+      "distance_kpc": 0.08910109964505672,
+      "radius_kpc": 0.09162849597936502,
+      "thickness_kpc": 0.043923516304422726,
+      "excess_408_k": 5.453370545156636,
+      "beta_temperature": -2.820891409729641,
+      "low_frequency_beta_temperature": -2.631225850326808,
+      "emitting_fraction": 0.5828283890350624
+    },
+    {
+      "name": "LOOP_I_S2",
+      "center_l_deg": 347.39195789191916,
+      "center_b_deg": 38.90418716472286,
+      "distance_kpc": 0.10313872719013124,
+      "radius_kpc": 0.09122920987570891,
+      "thickness_kpc": 0.05051622174040594,
+      "excess_408_k": 5.705748973773372,
+      "beta_temperature": -2.55,
+      "low_frequency_beta_temperature": -2.52,
+      "emitting_fraction": 0.5624249742477494
+    },
+    {
+      "name": "LOOP_II",
+      "center_l_deg": 98.86630338857661,
+      "center_b_deg": -31.262378229449,
+      "distance_kpc": 0.10246149054767457,
+      "radius_kpc": 0.06588820532509945,
+      "thickness_kpc": 0.02493901024262526,
+      "excess_408_k": 9.0,
+      "beta_temperature": -2.850841889605018,
+      "low_frequency_beta_temperature": -2.593279448919989,
+      "emitting_fraction": 0.437953533386712
+    },
+    {
+      "name": "LOOP_III",
+      "center_l_deg": 122.55323137321615,
+      "center_b_deg": 16.514420301629603,
+      "distance_kpc": 0.12363377426868177,
+      "radius_kpc": 0.0911276532647693,
+      "thickness_kpc": 0.03461893955574948,
+      "excess_408_k": 9.0,
+      "beta_temperature": -2.738997064689162,
+      "low_frequency_beta_temperature": -2.703752537697774,
+      "emitting_fraction": 0.5178808536037882
+    },
+    {
+      "name": "LOOP_IV",
+      "center_l_deg": 316.8122606123846,
+      "center_b_deg": 47.57853680162465,
+      "distance_kpc": 0.15605124937549714,
+      "radius_kpc": 0.07034531928660606,
+      "thickness_kpc": 0.022344548425001824,
+      "excess_408_k": 3.0,
+      "beta_temperature": -2.9227291159796835,
+      "low_frequency_beta_temperature": -2.7550450327159868,
+      "emitting_fraction": 0.37515019903444685
+    }
+  ]
+}

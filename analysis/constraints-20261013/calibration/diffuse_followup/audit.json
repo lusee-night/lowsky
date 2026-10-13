@@ -1,0 +1,30 @@
+{
+  "status": "unresolved_no_core_change",
+  "orion_south_22_mhz_K": {
+    "observed_mean": 20231.727505350955,
+    "model_mean": 44115.17968921259,
+    "extragalactic": 22603.329150074995,
+    "volume_synch": 17813.38595442866,
+    "local_shells": 3681.304944550951,
+    "freefree": 17.15964015798749
+  },
+  "orion_south_45_mhz_K": {
+    "observed_mean": 4449.089824916308,
+    "model_mean": 6865.5023861601485,
+    "extragalactic": 3577.227762039586,
+    "volume_synch": 2763.0759805529924,
+    "local_shells": 521.3841149258553,
+    "freefree": 3.814528641714942
+  },
+  "thermal_screen_counterfactual": {
+    "Te_K": 8000,
+    "required_tau_22_full_coverage": 1.0826800757799397,
+    "required_EM_pc_cm_minus6": 807.0220725810113,
+    "saved_orion_effective_EM_max_pc_cm_minus6": 25.783363342285156,
+    "opacity_only_fix_status": "fails_45_mhz_sign_test"
+  },
+  "model_extragalactic_formula": "1.2*(frequency_MHz/1000)^(-2.58) K before absorption",
+  "survey_source": "https://arxiv.org/html/astro-ph/9902213",
+  "comparison_json": "analysis/constraints-20261013/comparisons/radio_regions/radio_regions.json",
+  "component_bin_json": "analysis/constraints-20261013/calibration/diffuse/fit.json"
+}

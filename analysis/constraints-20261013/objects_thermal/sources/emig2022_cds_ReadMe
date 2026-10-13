@@ -1,0 +1,120 @@
+J/A+A/664/A88       LOFAR 148MHz Cygnus X region image             (Emig+, 2022)
+================================================================================
+Filamentary structures of ionized gas in Cygnus X.
+    Emig K.L., White G.J., Salas P., Karim R.L., van Weeren R.J., Teuben P.J.,
+    Zavagno A., Chiu P., Haverkorn M., Oonk J.B.R., Orru E., Polderman I.M.,
+    Reich W., Roettgering H.J.A., Tielens A.G.G.M.
+    <Astron. Astrophys. 664, A88 (2022)>
+    =2022A&A...664A..88E        (SIMBAD/NED BibCode)
+================================================================================
+ADC_Keywords: Milky Way ; Associations, stellar ; H II regions ; Radio sources
+Keywords: radio continuum: ISM - H II regions - ISM: general -
+          Galaxy: open clusters and associations: individual: Cygnus OB2 -
+          techniques: image processing
+
+Abstract:
+    Ionized gas probes the influence of massive stars on their
+    environment. The Cygnus X region (d~1.5kpc) is one of the most massive
+    star forming complexes in our Galaxy, in which the Cyg OB2 association
+    (age of 3-5Myr and stellar mass 2x10^4^M_{sun}_) has a dominant
+    influence.
+
+    We observe the Cygnus X region at 148 MHz using the Low Frequency
+    Array (LOFAR) and take into account short-spacing information during
+    image deconvolution. Together with data from the Canadian Galactic
+    Plane Survey, we investigate the morphology, distribution, and
+    physical conditions of low-density ionized gas in a 4'x4'
+    (~100pcx100pc) region at a resolution of 2' (0.9pc).
+
+    The Galactic radio emission in the region analyzed is almost entirely
+    thermal (free-free) at 148 MHz, with emission measures (EM) of
+    10^3^<EM[pc/cm^6^]<10^6^. As filamentary structure is a prominent
+    feature of the emission, we use DisPerSE and FilChaP to identify
+    filamentary ridges and characterize their radial (EM) profiles.
+
+    The distribution of radial profiles has a characteristic width of
+    4.3pc and a power-law distribution ({beta}=-1.8+/-0.1) in peak EM down
+    to our completeness limit of 4200pc/cm^6^. The electron densities of
+    the filamentary structure range between 10<=n_e_[cm^-3^]<=400 with a
+    median value of 35cm^-3^, remarkably similar to [NII] surveys of
+    ionized gas.
+
+    Cyg OB2 may ionize at most two-thirds of the total ionized gas and the
+    ionized gas in filaments. More than half of the filamentary structures
+    are likely photoevaporating surfaces flowing into a surrounding
+    diffuse (5cm^-3^) medium. However, this is likely not the case for all
+    ionized gas ridges. A characteristic width in the distribution of
+    ionized gas points to the stellar winds of Cyg OB2 creating a fraction
+    of the ionized filaments through swept-up ionized gas or dissipated
+    turbulence.
+
+Description:
+    LOFAR interferometric observations of one pointing centered
+    approximately on the massive star forming region DR 21 at
+    (RA, dec) = (309.5500{deg}, +42.0708{deg}) in J2000 coordinates. These
+    data were obtained with the high band antennas (HBA) covering
+    110-190MHz on July 19, 2013 under project LC0_032 (PI: G. White).
+    Continuous frequency coverage was obtained between 126-165MHz and
+    which we make use of in this analysis. 23 stations of the full Dutch
+    array recorded data during these observations, which have a maximum
+    baseline of 120km (4") and minimum baseline lengths of 70m
+    corresponding to largest angular scales of 96' (1.6{deg}). The
+    on-source integration time is 6 hours and 50 minutes.
+
+Objects:
+    ----------------------------------------------
+       RA  (2000)  DE     Designation(s)
+    ----------------------------------------------
+    20 28 41    +41 10.2  Cygnus X = NAME Cyg X
+    ----------------------------------------------
+
+File Summary:
+--------------------------------------------------------------------------------
+ FileName      Lrecl  Records   Explanations
+--------------------------------------------------------------------------------
+ReadMe            80        .   This file
+list.dat         150        1   Information of fits image
+fits/*             .        1   Fits image
+--------------------------------------------------------------------------------
+
+See also:
+ J/A+A/241/551    : Radio continuum in Cygnus X region (Wendker+ 1991)
+ J/A+A/375/539    : Compact HII regions in Cyg X JHK photometry (Comeron+, 2001)
+ J/ApJ/643/238    : Chandra/2MASS sources in Cygnus OB2 (Butt+, 2006)
+ J/A+A/474/495    : X-ray flares from Cygnus OB2 young stars
+                                                  (Albacete Colombo+, 2007)
+ J/A+A/476/1243   : Millimeter continuum mapping of Cygnus X (Motte+, 2007)
+ J/ApJS/184/84    : X-ray sources in Cyg OB2 region (Wright+, 2009)
+ J/ApJ/713/871    : Sources in star-forming region Cyg-OB2 from X-ray
+                                                  (Wright+, 2010)
+ J/A+A/527/A135   : Gas dynamics in Massive Dense Cores in Cygnus-X
+                                                  (Csengeri+, 2011)
+ J/ApJ/727/114    : BLAST 2005: a 10deg^2^ survey in Cygnus X (Roy+, 2011)
+ J/A+A/570/A1     : Cygnus-X CO and SiO outflows datacubes
+                                                  (Duarte-Cabral+, 2014)
+ J/AJ/148/11      : Infrared photometry in Cygnus-X (Kryukova+, 2014)
+ J/MNRAS/458/3027 : Young and embedded clusters in Cygnus-X (Maia+, 2016)
+ J/ApJS/234/8     : YSO jets from UWISH2. IV. Cygnus-X outflows (Makin+, 2018)
+ J/ApJ/883/156    : Nobeyama 45m Cygnus-X CO. II. C180 clumps (Takekoshi+, 2019)
+
+Byte-by-byte Description of file: list.dat
+--------------------------------------------------------------------------------
+   Bytes Format Units   Label     Explanations
+--------------------------------------------------------------------------------
+       1  A1    ---     ---       [G]
+   2- 10  F9.5  deg     GLON      Galactic longitude
+  11- 19  F9.5  deg     GLAT      Galactic latitude
+  21- 23  I3    ---     Nx        Number of pixels along X-axis
+  25- 27  I3    ---     Ny        Number of pixels along Y-axis
+  29- 50  A22  "datime" Obs.date  Observation date
+  52- 58  F7.3  MHz     Freq      [148.046] Observed frequency
+  60- 63  I4    Kibyte  size      Size of FITS file
+  65-101  A37   ---     FileName  Name of FITS file, in subdirectory fits
+ 103-150  A48   ---     Title     Title of the FITS file
+--------------------------------------------------------------------------------
+
+Acknowledgements:
+     Kimberly L. Emig, kemig(at)nrao.edu
+
+================================================================================
+(End)                                        Patricia Vannier [CDS]  03-Jun-2022

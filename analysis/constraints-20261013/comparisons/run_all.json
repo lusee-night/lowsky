@@ -1,0 +1,25 @@
+{
+  "runs": [
+    {
+      "comparison": "bright_sources",
+      "command": [
+        "/home/zack/Projects/ulsa-counterfactual/.venv/bin/python",
+        "/home/zack/Projects/ulsa-counterfactual/examples/compare_bright_sources.py",
+        "--output-dir",
+        "/home/zack/Projects/ulsa-counterfactual/analysis/constraints-20261013/comparisons/bright_sources"
+      ],
+      "status": "completed"
+    },
+    {
+      "comparison": "radio_regions",
+      "command": [
+        "/home/zack/Projects/ulsa-counterfactual/.venv/bin/python",
+        "/home/zack/Projects/ulsa-counterfactual/examples/compare_radio_regions.py",
+        "--output-dir",
+        "/home/zack/Projects/ulsa-counterfactual/analysis/constraints-20261013/comparisons/radio_regions"
+      ],
+      "status": "completed"
+    }
+  ],
+  "interpretation": "Diagnostics with documented observation-operator limits; no refitting or certified region of correctness."
+}

@@ -1,0 +1,584 @@
+{
+  "method": {
+    "comparison": "descriptive direct survey versus saved no-A-team lowsky model; no fitted gain or offset",
+    "coordinates": "Galactic RING NSIDE=32",
+    "additional_gaussian_fwhm_deg": 12.0,
+    "shared_operator": "survey and model each convolved with the same survey validity/source mask and lmax=64, then degraded to NSIDE=32",
+    "native_model_beam_fwhm_deg": 2.0,
+    "survey_native_beams": "position-dependent, anisotropic 1--4.6 degrees; common effective beam only approximate",
+    "valid_weight_minimum": 0.98,
+    "bright_source_aperture_radius_deg": 8,
+    "45_MHz_component": "equatorial declination <-2 degrees, southern Maipu 45 MHz only",
+    "10_03_MHz_model_interpolation": "log-temperature versus log-frequency between integer 10 and 11 MHz maps",
+    "scatter_definition": "16th--84th percentile of spatial pixels, not statistical measurement uncertainty",
+    "calibration_caveats": [
+      "10.03 MHz absolute zero-level and pixel-error model not verified",
+      "22 MHz declination gain tied to Haslam 408 MHz; possible ~5 kK zero-level systematic",
+      "45 MHz hosted composite lacks EDGES-derived gain/offset correction",
+      "Lowsky was tuned to ULSA and some same low-frequency survey lineages; residuals are not independent validation"
+    ],
+    "frequency_range_mhz": [
+      1,
+      50
+    ],
+    "model_validated_ell_max": 64
+  },
+  "inputs": {
+    "/home/zack/Projects/ulsa-counterfactual/outputs_our_sky_gum_gaussian_final/counterfactual_ulsa_nside32_1_50mhz.fits": "c4839445df0e801e49f5a2d7c833232f6f445eda388d10e4b27e55bb180bae9c",
+    "/home/zack/Projects/ulsa-counterfactual/analysis/constraints-20261013/radio_surveys/data/DRAO_10MHz_hpx_r7.fits": "b0d38aa596b674882104cb5bc8aab936cd307652a5cf77552abb542e8d8bdd7c",
+    "/home/zack/Projects/ulsa-counterfactual/analysis/constraints-20261013/radio_surveys/data/lambda_DRAO_22MHz_1_256.fits": "05f528cf5e3a62d5376b63cbc72841b396d18d14ae4ba187fc3f7d662263faf9",
+    "/home/zack/Projects/ulsa-counterfactual/analysis/constraints-20261013/radio_surveys/data/MAIPU_MU_1_64.fits": "f1b43adb264bb429b5a5bc3e4337088e158cde322823211c51206c0aef129a81"
+  },
+  "regions": {
+    "anticenter_north": {
+      "bounds_galactic_deg": [
+        160,
+        200,
+        15,
+        40
+      ],
+      "survey_ids": [
+        "10.03",
+        "22"
+      ],
+      "common_pixel_count": 261,
+      "by_frequency": {
+        "10.03": {
+          "frequency_mhz": 10.03,
+          "survey_temperature_K_q16_q50_q84": [
+            178686.9316131906,
+            225872.890956476,
+            262144.09768555843
+          ],
+          "model_temperature_K_q16_q50_q84": [
+            310097.69244182756,
+            324842.61802469305,
+            350670.474643647
+          ],
+          "fractional_residual_q16_q50_q84": [
+            -0.4873891999565174,
+            -0.3097630055137226,
+            -0.1594963360467017
+          ],
+          "longitude_bins": [
+            {
+              "lon_min_deg": 160.0,
+              "lon_max_deg": 166.66666666666666,
+              "pixel_count": 45,
+              "survey_K_q16_q50_q84": [
+                216116.13825665863,
+                253977.8573937319,
+                287548.6522074926
+              ],
+              "model_K_q16_q50_q84": [
+                302434.6649866107,
+                332985.5356083045,
+                379514.68588554166
+              ],
+              "fractional_residual_q16_q50_q84": [
+                -0.43037189648442015,
+                -0.24389591540104963,
+                -0.05015827184776167
+              ]
+            },
+            {
+              "lon_min_deg": 166.66666666666666,
+              "lon_max_deg": 173.33333333333334,
+              "pixel_count": 45,
+              "survey_K_q16_q50_q84": [
+                198009.91534343592,
+                241439.71187407937,
+                271682.7409548047
+              ],
+              "model_K_q16_q50_q84": [
+                298088.1861123591,
+                311404.1147649082,
+                352256.8265164654
+              ],
+              "fractional_residual_q16_q50_q84": [
+                -0.4455138449500983,
+                -0.23490408544446564,
+                -0.08631043439466617
+              ]
+            },
+            {
+              "lon_min_deg": 173.33333333333334,
+              "lon_max_deg": 180.0,
+              "pixel_count": 36,
+              "survey_K_q16_q50_q84": [
+                181067.97300751918,
+                227528.05340417518,
+                263182.27149246575
+              ],
+              "model_K_q16_q50_q84": [
+                306014.3024938466,
+                313937.298020187,
+                345544.5405360531
+              ],
+              "fractional_residual_q16_q50_q84": [
+                -0.47584979954871354,
+                -0.27392535747362656,
+                -0.14006403913023835
+              ]
+            },
+            {
+              "lon_min_deg": 180.0,
+              "lon_max_deg": 186.66666666666666,
+              "pixel_count": 45,
+              "survey_K_q16_q50_q84": [
+                171797.48543898828,
+                217086.69629890844,
+                254513.57772041563
+              ],
+              "model_K_q16_q50_q84": [
+                318247.19398117345,
+                323656.9356471829,
+                344411.0317211407
+              ],
+              "fractional_residual_q16_q50_q84": [
+                -0.5011845962491922,
+                -0.33231837992499913,
+                -0.19778789704866148
+              ]
+            },
+            {
+              "lon_min_deg": 186.66666666666666,
+              "lon_max_deg": 193.33333333333334,
+              "pixel_count": 45,
+              "survey_K_q16_q50_q84": [
+                164332.18601302727,
+                208470.35175340695,
+                244777.05020489366
+              ],
+              "model_K_q16_q50_q84": [
+                320419.872052274,
+                325922.45598020754,
+                345820.7722906403
+              ],
+              "fractional_residual_q16_q50_q84": [
+                -0.530035973207874,
+                -0.36281216903484803,
+                -0.23948953643061205
+              ]
+            },
+            {
+              "lon_min_deg": 193.33333333333334,
+              "lon_max_deg": 200.0,
+              "pixel_count": 45,
+              "survey_K_q16_q50_q84": [
+                163423.7442226336,
+                206828.38166806762,
+                242886.65376832525
+              ],
+              "model_K_q16_q50_q84": [
+                323243.6015194094,
+                326747.53952957486,
+                338036.6052462867
+              ],
+              "fractional_residual_q16_q50_q84": [
+                -0.5085223342107106,
+                -0.36378065025507633,
+                -0.2613297113978411
+              ]
+            }
+          ]
+        },
+        "22": {
+          "frequency_mhz": 22.0,
+          "survey_temperature_K_q16_q50_q84": [
+            23239.172683389934,
+            30437.148780755346,
+            36752.338426973074
+          ],
+          "model_temperature_K_q16_q50_q84": [
+            40562.04267518972,
+            41957.20550206121,
+            44265.6939974159
+          ],
+          "fractional_residual_q16_q50_q84": [
+            -0.4774002995313293,
+            -0.28157216678476177,
+            -0.10294526409376993
+          ],
+          "longitude_bins": [
+            {
+              "lon_min_deg": 160.0,
+              "lon_max_deg": 166.66666666666666,
+              "pixel_count": 45,
+              "survey_K_q16_q50_q84": [
+                29271.721064892565,
+                36183.67397906582,
+                42163.7536982788
+              ],
+              "model_K_q16_q50_q84": [
+                39799.36144023125,
+                43292.525879263994,
+                48103.5359918502
+              ],
+              "fractional_residual_q16_q50_q84": [
+                -0.38004608138033646,
+                -0.16656529090620248,
+                0.03891482676475635
+              ]
+            },
+            {
+              "lon_min_deg": 166.66666666666666,
+              "lon_max_deg": 173.33333333333334,
+              "pixel_count": 45,
+              "survey_K_q16_q50_q84": [
+                26420.018023990022,
+                33636.82928959598,
+                38147.170316137745
+              ],
+              "model_K_q16_q50_q84": [
+                39354.32977299216,
+                40549.430934505916,
+                44456.8876620803
+              ],
+              "fractional_residual_q16_q50_q84": [
+                -0.4150082400546362,
+                -0.17090603326017503,
+                -0.03074146396969932
+              ]
+            },
+            {
+              "lon_min_deg": 173.33333333333334,
+              "lon_max_deg": 180.0,
+              "pixel_count": 36,
+              "survey_K_q16_q50_q84": [
+                23884.818969515363,
+                31248.175997643622,
+                36274.62897444033
+              ],
+              "model_K_q16_q50_q84": [
+                40280.23514773025,
+                40972.646827063996,
+                43719.17708754108
+              ],
+              "fractional_residual_q16_q50_q84": [
+                -0.45361367444108613,
+                -0.2326648785178208,
+                -0.10147138315400728
+              ]
+            },
+            {
+              "lon_min_deg": 180.0,
+              "lon_max_deg": 186.66666666666666,
+              "pixel_count": 45,
+              "survey_K_q16_q50_q84": [
+                22286.33210270052,
+                29136.769919919152,
+                34728.82269908601
+              ],
+              "model_K_q16_q50_q84": [
+                41591.350410400424,
+                42011.1954075376,
+                43587.85330497632
+              ],
+              "fractional_residual_q16_q50_q84": [
+                -0.48870302773409363,
+                -0.30015091859661325,
+                -0.16605241904750123
+              ]
+            },
+            {
+              "lon_min_deg": 186.66666666666666,
+              "lon_max_deg": 193.33333333333334,
+              "pixel_count": 45,
+              "survey_K_q16_q50_q84": [
+                21022.91892947991,
+                27668.665537748024,
+                33352.471454568615
+              ],
+              "model_K_q16_q50_q84": [
+                41614.401875891715,
+                42020.921312994804,
+                43706.19020430593
+              ],
+              "fractional_residual_q16_q50_q84": [
+                -0.5232229687050545,
+                -0.3425868596780179,
+                -0.20540498349507524
+              ]
+            },
+            {
+              "lon_min_deg": 193.33333333333334,
+              "lon_max_deg": 200.0,
+              "pixel_count": 45,
+              "survey_K_q16_q50_q84": [
+                20410.838738394494,
+                26464.128357576734,
+                31678.817295337278
+              ],
+              "model_K_q16_q50_q84": [
+                41577.380498803155,
+                42002.084184429295,
+                43069.660426573464
+              ],
+              "fractional_residual_q16_q50_q84": [
+                -0.5153330007792266,
+                -0.3649244154772861,
+                -0.2431904513475728
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "orion_south": {
+      "bounds_galactic_deg": [
+        205,
+        220,
+        -45,
+        -20
+      ],
+      "survey_ids": [
+        "22",
+        "45south"
+      ],
+      "common_pixel_count": 39,
+      "by_frequency": {
+        "22": {
+          "frequency_mhz": 22.0,
+          "survey_temperature_K_q16_q50_q84": [
+            19211.8900436664,
+            19929.198951084305,
+            21295.10908128282
+          ],
+          "model_temperature_K_q16_q50_q84": [
+            43056.21403406097,
+            43737.91980900595,
+            45177.26545932763
+          ],
+          "fractional_residual_q16_q50_q84": [
+            -0.5605008106907976,
+            -0.5436023903303717,
+            -0.523958912100086
+          ],
+          "longitude_bins": [
+            {
+              "lon_min_deg": 207.5,
+              "lon_max_deg": 210.0,
+              "pixel_count": 6,
+              "survey_K_q16_q50_q84": [
+                19736.640540498378,
+                19952.197276387924,
+                20100.821752050364
+              ],
+              "model_K_q16_q50_q84": [
+                43025.64509880846,
+                43680.672413718334,
+                44359.280319684454
+              ],
+              "fractional_residual_q16_q50_q84": [
+                -0.5516578563631286,
+                -0.5435093729840748,
+                -0.5377730289019707
+              ]
+            },
+            {
+              "lon_min_deg": 210.0,
+              "lon_max_deg": 212.5,
+              "pixel_count": 9,
+              "survey_K_q16_q50_q84": [
+                19294.966137134168,
+                19465.16121888414,
+                19854.55964531359
+              ],
+              "model_K_q16_q50_q84": [
+                42789.98468699987,
+                43075.47355788227,
+                44269.520655633365
+              ],
+              "fractional_residual_q16_q50_q84": [
+                -0.5601565622912288,
+                -0.5491114023271714,
+                -0.5346559608896871
+              ]
+            },
+            {
+              "lon_min_deg": 212.5,
+              "lon_max_deg": 215.0,
+              "pixel_count": 5,
+              "survey_K_q16_q50_q84": [
+                19021.02495602064,
+                19261.349042042173,
+                20270.400935660433
+              ],
+              "model_K_q16_q50_q84": [
+                43001.992422038864,
+                43282.05521891485,
+                43804.395255415715
+              ],
+              "fractional_residual_q16_q50_q84": [
+                -0.5637797989293075,
+                -0.5511072390629264,
+                -0.5314263078720508
+              ]
+            },
+            {
+              "lon_min_deg": 215.0,
+              "lon_max_deg": 217.5,
+              "pixel_count": 10,
+              "survey_K_q16_q50_q84": [
+                19034.345572857776,
+                19999.51723152025,
+                22043.750292880904
+              ],
+              "model_K_q16_q50_q84": [
+                43240.305939668535,
+                43868.85748784688,
+                45143.74016244952
+              ],
+              "fractional_residual_q16_q50_q84": [
+                -0.5608380990408406,
+                -0.5440878396613553,
+                -0.510316945627884
+              ]
+            },
+            {
+              "lon_min_deg": 217.5,
+              "lon_max_deg": 220.0,
+              "pixel_count": 7,
+              "survey_K_q16_q50_q84": [
+                20110.41665380528,
+                21590.14161877602,
+                23489.824527837587
+              ],
+              "model_K_q16_q50_q84": [
+                44934.7738433685,
+                45889.52819306862,
+                46707.165491316286
+              ],
+              "fractional_residual_q16_q50_q84": [
+                -0.5564318743416498,
+                -0.5295192069105409,
+                -0.49708594494497577
+              ]
+            }
+          ]
+        },
+        "45south": {
+          "frequency_mhz": 45.0,
+          "survey_temperature_K_q16_q50_q84": [
+            4146.2408424789255,
+            4282.998505022604,
+            4838.050316530865
+          ],
+          "model_temperature_K_q16_q50_q84": [
+            6709.245569537829,
+            6806.204902062833,
+            7041.544659538071
+          ],
+          "fractional_residual_q16_q50_q84": [
+            -0.3899820905780941,
+            -0.3618396548656289,
+            -0.3108798812380371
+          ],
+          "longitude_bins": [
+            {
+              "lon_min_deg": 207.5,
+              "lon_max_deg": 210.0,
+              "pixel_count": 6,
+              "survey_K_q16_q50_q84": [
+                4160.495977936145,
+                4172.749774176774,
+                4191.733380369837
+              ],
+              "model_K_q16_q50_q84": [
+                6696.022676767274,
+                6772.279851748308,
+                6843.61495310124
+              ],
+              "fractional_residual_q16_q50_q84": [
+                -0.39287626226381694,
+                -0.3839295931462513,
+                -0.3757209137585652
+              ]
+            },
+            {
+              "lon_min_deg": 210.0,
+              "lon_max_deg": 212.5,
+              "pixel_count": 9,
+              "survey_K_q16_q50_q84": [
+                4126.409164164848,
+                4174.090920104669,
+                4323.266276747283
+              ],
+              "model_K_q16_q50_q84": [
+                6679.294797449453,
+                6725.559155298374,
+                6865.135207220032
+              ],
+              "fractional_residual_q16_q50_q84": [
+                -0.3990437513254792,
+                -0.37636513257330173,
+                -0.35182959548343007
+              ]
+            },
+            {
+              "lon_min_deg": 212.5,
+              "lon_max_deg": 215.0,
+              "pixel_count": 5,
+              "survey_K_q16_q50_q84": [
+                4123.361084434707,
+                4240.296111970408,
+                4490.79315729617
+              ],
+              "model_K_q16_q50_q84": [
+                6713.374621136472,
+                6745.630535617556,
+                6825.316658688432
+              ],
+              "fractional_residual_q16_q50_q84": [
+                -0.392357895329732,
+                -0.366890536041691,
+                -0.33501619248715325
+              ]
+            },
+            {
+              "lon_min_deg": 215.0,
+              "lon_max_deg": 217.5,
+              "pixel_count": 10,
+              "survey_K_q16_q50_q84": [
+                4245.073539223184,
+                4528.319153110167,
+                4955.012740783533
+              ],
+              "model_K_q16_q50_q84": [
+                6746.53433389793,
+                6844.349283283869,
+                7035.69341456885
+              ],
+              "fractional_residual_q16_q50_q84": [
+                -0.3705814223054731,
+                -0.3383966668292028,
+                -0.2957472265327289
+              ]
+            },
+            {
+              "lon_min_deg": 217.5,
+              "lon_max_deg": 220.0,
+              "pixel_count": 7,
+              "survey_K_q16_q50_q84": [
+                4654.915558022019,
+                4957.903664049498,
+                5302.490276632431
+              ],
+              "model_K_q16_q50_q84": [
+                7002.047486237769,
+                7144.476993140923,
+                7268.164458296219
+              ],
+              "fractional_residual_q16_q50_q84": [
+                -0.335221850234771,
+                -0.3060508601526258,
+                -0.27045499848932264
+              ]
+            }
+          ]
+        }
+      }
+    }
+  }
+}

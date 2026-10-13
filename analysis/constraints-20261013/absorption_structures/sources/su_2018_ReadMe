@@ -1,0 +1,120 @@
+J/MNRAS/479/4041     HII regions at 76.2MHz synchrotron emissivities (Su+, 2018)
+================================================================================
+Galactic synchrotron distribution derived from 152 H II region absorption
+features in the full GLEAM survey.
+    Su H., Macquart J.P., Hurley-Walker N., McClure-Griffiths N.M.,
+    Jackson C.A., Tingay S.J., Tian W.W., Gaensler B.M., McKinley B.,
+    Kapinska A.D., Hindson L., Hancock P., Wayth R.B., Staveley-Smith L.,
+    Morgan J., Johnston-Hollitt M., Lenc E., Bell M.E., Callingham J.R.,
+    Dwarkanath K.S., For B.-Q., Offringa A.R., Procopio P., Wu C., Zheng Q.
+   <Mon. Not. R. Astron. Soc., 479, 4041-4055 (2018)>
+   =2018MNRAS.479.4041S    (SIMBAD/NED BibCode)
+================================================================================
+ADC_Keywords: H II regions ; Radio continuum
+Keywords: cosmic rays - HII regions - Galaxy: structure -
+          radio continuum: general
+
+Abstract:
+    We derive the synchrotron distribution in the Milky Way disc from HII
+    region absorption observations over -40{deg}<l<40{deg} at six
+    frequencies of 76.2, 83.8, 91.5, 99.2, 106.9, and 114.6MHz with the
+    GaLactic and Extragalactic All-sky Murchison Widefield array survey
+    (GLEAM). We develop a new method of emissivity calculation by taking
+    advantage of the Haslam et al. (1981A&A...100..209H) map and known
+    spectral indices, which enable us to simultaneously derive the
+    emissivity and the optical depth of HII regions at each frequency. We
+    show our derived synchrotron emissivities based on 152 absorption
+    features of HII regions using both the method previously adopted in
+    the literature and our improved method. We derive the synchrotron
+    emissivity from HII regions to the Galactic edge along the line of
+    sight and, for the first time, derive the emissivity from HII regions
+    to the Sun. These results provide direct information on the
+    distribution of the Galactic magnetic field and cosmic ray electrons
+    for future modelling.
+
+Description:
+    We use data obtained by the MWA as part of the GaLactic and
+    Extragalactic All-sky MWA survey (GLEAM; Wayth et al.,
+    2015PASA...32...25W). We calculate the synchrotron emissivities both
+    behind and in front of 152 HII regions at six frequencies of 76.2,
+    83.8, 91.5, 99.2, 106.9, and 114.6MHz. This new method enables us to
+    derive the HII region optical depth and estimate the amount of flux
+    density missing from our observations at each frequency. We find that
+    the emissivities increase towards the Galactic centre.
+
+File Summary:
+--------------------------------------------------------------------------------
+ FileName      Lrecl  Records   Explanations
+--------------------------------------------------------------------------------
+ReadMe            80        .   This file
+tablea1.dat      179      152   The derived synchrotron emissivities and optical
+                                 depths of HII regions at 76.2MHz
+--------------------------------------------------------------------------------
+
+See also:
+ VIII/100 : GaLactic and Extragalactic All-sky MWA survey (Hurley-Walker+, 2016)
+
+Byte-by-byte Description of file: tablea1.dat
+--------------------------------------------------------------------------------
+   Bytes Format Units   Label     Explanations
+--------------------------------------------------------------------------------
+   1- 15  A15   ---     HII       HII Region name (GLLL.lll+BB.bbb)
+  17- 20  F4.1  kpc     Dist      Distance from HII region to the sun
+  22- 24  F3.1  kpc   e_Dist      Distance error
+  26- 30  F5.2  10+3K   Te        Electron temperature
+  32- 35  F4.2  10+3K e_Te        Electron temperature error
+  37- 40  F4.1  10+3K   Th        Measured brightness temperature in the
+                                   direction of the absorbed region
+  42- 44  F3.1  10+3K e_Th        Th error
+  46- 49  F4.1  10+3K   Tm        Measured brightness temperature from the Sun
+                                   to the Galactic edge in the absence of HII
+                                   region emission from the GLEAM map
+  51- 53  F3.1  10+3K e_Tm        Tm error
+  55- 59  F5.1  10+3K   Tt        Total brightness temperature from the Sun to
+                                   the Galactic edge in the absence of HII
+                                   region absorption derived from the Haslam map
+  61- 64  F4.1  10+3K e_Tt        Tt error
+  66- 69  F4.1  10+3K   Tb        Derived brightness temperature of the
+                                   synchrotron emission from HII regions to
+                                   the Galactic edge
+  71- 75  F5.1  10+3K E_Tb        Tb error (upper value)
+  77- 81  F5.1  10+3K e_Tb        Tb error (lower value)
+  83- 86  F4.1  10+3K   Tf        Derived brightness temperature of the
+                                   synchrotron emission from the HII region to
+                                   the Sun
+  88- 92  F5.1  10+3K E_Tf        Tf error (upper value)
+  94- 98  F5.1  10+3K e_Tf        Tf error (lower value)
+ 100-103  F4.1  10+3K   Xb        Brightness temperature of the emission on the
+                                   missing short interferometric spacings
+                                   between the Galactic edge and the Sun (1)
+ 105-109  F5.1  10+3K E_Xb        Xb error (upper value)
+ 111-115  F5.1  10+3K e_Xb        Xb error (lower value)
+ 117-120  F4.1  10+3K   Xf        Brightness temperature of the emission on the
+                                   missing short interferometric spacings
+                                   between an HII region and the Sun (1)
+ 122-126  F5.1  10+3K E_Xf        Xf error (upper value)
+ 128-132  F5.1  10+3K e_Xf        Xf error (lower value)
+     134  A1    ---   l_tau       Limit flag on tau
+ 135-138  F4.1  ---     tau       Optical depth of the HII region
+ 140-142  F3.1  K/pc    emb       Average emissivity between the HII region and
+                                   the Galactic edge
+ 144-147  F4.1  K/pc  E_emb       emb error (upper value)
+ 149-152  F4.1  K/pc  e_emb       emb error (lower value)
+ 154-157  F4.1  K/pc    emf       Average emissivity between the HII region and
+                                   the Sun
+ 159-163  F5.1  K/pc  E_emf       emf error (upper value)
+ 165-169  F5.1  K/pc  e_emf       emf error (lower value)
+ 171-174  F4.2  K/pc    embsim    Emissivity between the HII region and the
+                                   Galactic edge derived from the simplified
+                                   method
+ 176-179  F4.2  K/pc  e_embsim    embsim error
+--------------------------------------------------------------------------------
+Note (1): The emissivities will be ~15 per cent lower if you accept a
+ synchrotron spectral index of -2.6 instead of -2.7 we used.
+--------------------------------------------------------------------------------
+
+History:
+    From electronic version of the journal
+
+================================================================================
+(End)                                           Ana Fiallos [CDS]    04-May-2022

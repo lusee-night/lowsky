@@ -1,0 +1,17 @@
+# Diffuse calibration: independent bounded audit
+
+Reviewed 2026-10-13, using the current `src/lowsky/calibration.py`, `examples/calibrate_diffuse.py`, `examples/compare_radio_regions.py`, model component definitions, and `calibration/diffuse/fit.json`. This is a code and artifact audit; I did not rerun the fit.
+
+## Findings
+
+1. **Component combination is correct at map-pixel level, subject to fixed physical fields.** `calibrated_no_sources_from_components` applies `emissivity_ratio * (frequency/408 MHz)^beta_offset_delta` only to `STOCHASTIC_SYNCH`, then adds unchanged `LOCAL_SHELLS`, `FREEFREE`, and `EXTRAGALACTIC`. This agrees with `pipeline.py`'s `no_sources` sum and `model.py`'s dependence of volume synchrotron on emissivity scale and spectral index offset. `SMOOTH_SYNCH` is correctly excluded. The subsequent fit is to a **sum of separate component medians**, however, which generally differs from the median of the combined source-free map. Thus plotted/bin predictions are an approximation to the regional map statistic, not an exact recomputation of it.
+
+2. **The train/holdout split is real at the residual-bin level but spatially dependent.** Even longitude bins enter the objective; odd bins do not. Both sets are drawn from the same two regions and the same survey maps. Survey and model maps are smoothed with a 12-degree Gaussian and `lmax=64` *before* assigning bins, so neighboring train and holdout bins share sky information through the operator. The two surveys within each region also reuse the same sky cells. Report the holdout as an adjacent-bin interpolation check, not independent spatial or instrument validation. There is no direct use of held-out residual values in `least_squares`.
+
+3. **The fitted parameters are pinned to both bounds.** `fit.json` gives emissivity ratio `0.30000000035` (lower bound 0.3) and beta offset delta `0.24999999975` (upper bound 0.25). These are constraint-limited estimates; the artifact supplies no parameter errors, survey error model, covariance, or stability analysis. Held-out median absolute log residual improves from 0.460 to 0.087 across 12 bins, but that is descriptive for this correlated split, not an uncertainty interval or evidence that the parameter optimum lies inside the bounds.
+
+4. **Fixed components impose an unresolved floor in some bins.** In Orion south at 22 MHz, `EXTRAGALACTIC` alone is about 22.6 kK while observed bin medians are about 19.3–21.6 kK; with the other nonnegative fixed components the prediction cannot reach those observations by changing diffuse synchrotron alone. This helps explain persistent Orion residuals and limits interpretation of a single global diffuse correction. The artifact appropriately notes that shell, opacity, free-free, and survey zero levels were not reoptimized.
+
+## Artifact status and claim scope
+
+Present at audit time: `calibration/diffuse/fit.json`, `before_after.png`, and `before_after.svg`. No uncertainty interval, independent-instrument holdout, or corrected full-sky FITS/map artifact is present in that directory. `fit.json` includes input hashes and explicitly warns about shared instrument calibration, zero levels, native beam mismatch, and model conditioning. The strongest supported claim is reduced residuals in the specified regional, smoothed, correlated bins under a fixed-opacity two-parameter correction. It does not establish calibrated physical parameters, independent predictive accuracy, or a correction to Orion/Gum structure.

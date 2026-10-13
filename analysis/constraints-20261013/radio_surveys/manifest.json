@@ -1,0 +1,151 @@
+{
+  "as_of": "2026-10-13",
+  "scope": "Resolved total-intensity radio-survey constraints for lowsky comparison plots; source survey maps, not ULSA/LFSM/GSM predictions.",
+  "units": "Rayleigh-Jeans brightness temperature K unless specified",
+  "local_files": [
+    {
+      "survey_id": "caswell10",
+      "path": "data/DRAO_10MHz_hpx_r7.fits",
+      "url": "https://lambda.gsfc.nasa.gov/data/foregrounds/drao/DRAO_10MHz_hpx_r7.fits",
+      "bytes": 794880,
+      "sha256": "b0d38aa596b674882104cb5bc8aab936cd307652a5cf77552abb542e8d8bdd7c",
+      "fits_hdu": 1,
+      "nside": 128,
+      "ordering": "NESTED",
+      "coordinates": "Galactic",
+      "valid_pixels": 54305,
+      "total_pixels": 196608,
+      "valid_pixel_definition": "finite and > -1e20; FITS BAD_DATA=-1.63750E+30"
+    },
+    {
+      "survey_id": "drao22",
+      "path": "data/lambda_DRAO_22MHz_1_256.fits",
+      "url": "https://lambda.gsfc.nasa.gov/data/foregrounds/drao/lambda_DRAO_22MHz_1_256.fits",
+      "bytes": 3156480,
+      "sha256": "05f528cf5e3a62d5376b63cbc72841b396d18d14ae4ba187fc3f7d662263faf9",
+      "fits_hdu": 1,
+      "nside": 256,
+      "ordering": "NESTED",
+      "coordinates": "Galactic",
+      "valid_pixels": 571976,
+      "total_pixels": 786432,
+      "valid_pixel_definition": "finite and not -32768; missing and sidelobe-affected pixels=-32768 in downloaded map"
+    },
+    {
+      "survey_id": "maipu_mu45",
+      "path": "data/MAIPU_MU_1_64.fits",
+      "url": "https://lambda.gsfc.nasa.gov/data/foregrounds/maipu_45/MAIPU_MU_1_64.fits",
+      "bytes": 204480,
+      "sha256": "f1b43adb264bb429b5a5bc3e4337088e158cde322823211c51206c0aef129a81",
+      "fits_hdu": 1,
+      "nside": 64,
+      "ordering": "NESTED",
+      "coordinates": "Galactic",
+      "valid_pixels": 47275,
+      "total_pixels": 49152,
+      "valid_pixel_definition": "finite and not -32768; northern unobserved region=-32768 in downloaded map"
+    }
+  ],
+  "surveys": [
+    {
+      "id": "caswell10",
+      "frequency_mhz": 10.03,
+      "frequency_note": "10.03 MHz is the downloaded FITS FREQ header; survey commonly called 10 MHz.",
+      "coverage": "Original RA 0-16 h, declination -6 to +74 degrees; valid downloaded pixels 27.621% of sky.",
+      "beam_fwhm_deg": "2.6 EW x 1.9 NS sec(z), position dependent",
+      "zero_level": "Absolute zero-level uncertainty not verified; do not fit monopole as a strong independent constraint.",
+      "point_sources": "Treatment in LAMBDA gridded map not verified; mask bright sources for diffuse-only comparison.",
+      "errors": "No per-pixel error map found on LAMBDA product page; calibration uncertainty not verified.",
+      "independence": "Observed data, but 10-MHz survey also contributes to ULSA-related empirical inputs; check exact ULSA lineage before claiming fully independent calibration.",
+      "sources": ["https://academic.oup.com/mnras/article/177/3/601/976089", "https://lambda.gsfc.nasa.gov/product/foreground/fg_drao_10_info.html"],
+      "data_page": "https://lambda.gsfc.nasa.gov/product/foreground/fg_drao_10_get.html",
+      "license": "LAMBDA public download; explicit redistribution license not located. Retain source attribution and review terms before redistribution."
+    },
+    {
+      "id": "drao22",
+      "frequency_mhz": 22.0,
+      "coverage": "Declination -28 to +80 degrees, about 73%; valid downloaded pixels 72.731% of sky.",
+      "beam_fwhm_deg": "About 1.1 EW x 1.7 NS sec(z) in Roger et al.; position dependent. LAMBDA page rounds differently.",
+      "zero_level": "Roger et al. report a possible 5 kK 22-MHz zero-level error for spectral-index sensitivity and ±10 kK T-T offsets; 22-MHz declination gain was adjusted using Haslam 408 MHz.",
+      "point_sources": "Cas A, Cyg A, Tau A, Vir A removed; other point sources remain and are unreliable for flux work. Downloaded map also masks sidelobe-affected pixels.",
+      "errors": "No per-pixel error map in downloaded product; zero-level and declination calibration systematics dominate large-scale spectral comparisons.",
+      "independence": "Observed sky morphology, but 408-MHz Haslam was used to correct the declination-dependent scale; a 22/408 slope is not independent of that calibration.",
+      "sources": ["https://arxiv.org/html/astro-ph/9902213", "https://lambda.gsfc.nasa.gov/product/foreground/fg_drao_info.html"],
+      "data_page": "https://lambda.gsfc.nasa.gov/product/foreground/fg_drao_get.html",
+      "license": "LAMBDA public download; explicit redistribution license not located. Retain source attribution and review terms before redistribution."
+    },
+    {
+      "id": "maipu_mu45",
+      "frequency_mhz": 45.0,
+      "frequency_note": "Combined southern 45-MHz and northern 46.5-MHz observations; do not call the entire pixel product an exact 45-MHz measurement.",
+      "coverage": "Southern declination -90 to +19.1 degrees, northern +5 to +65 degrees; valid downloaded pixels 96.181% of sky.",
+      "beam_fwhm_deg": "South 4.6 RA x 2.4 Dec; north 3.6 x 3.6; Guzman et al. combined spectral-index product at 5-degree resolution.",
+      "zero_level": "LAMBDA-hosted map has not received EDGES-derived scale 1.076 ± 0.034 and offset -160 ± 78 K (both 2 sigma); preserve correction uncertainty as nuisance.",
+      "point_sources": "Point-source subtraction status in this downloaded product not verified; mask A-team and compact-source apertures for diffuse test.",
+      "errors": "No paired per-pixel uncertainty product on LAMBDA page; EDGES absolute-calibration terms are available separately.",
+      "independence": "Direct survey maps; ULSA and other sky models also ingest 45-MHz survey data, so report conditioning overlap.",
+      "sources": ["https://arxiv.org/abs/1011.4298", "https://lambda.gsfc.nasa.gov/product/foreground/fg_maipu_info.html", "https://arxiv.org/abs/2012.11019"],
+      "data_page": "https://lambda.gsfc.nasa.gov/product/foreground/fg_maipu_get.html",
+      "license": "LAMBDA public download; explicit redistribution license not located. Retain source attribution and review terms before redistribution."
+    },
+    {
+      "id": "lwa1_llfss",
+      "frequencies_mhz": [35, 38, 40, 45, 50, 60, 70, 74, 80],
+      "coverage": "North of declination -40 degrees; actual per-frequency valid masks must be read from FITS.",
+      "beam_fwhm_deg": "Frequency dependent, about 4.7 at 35 MHz to 2.0 at 80 MHz.",
+      "zero_level": "Interferometric missing large scales restored using LEDA absolute total power and a forward model; reported conservative calibration uncertainty 15-25%, with systematic low temperatures near southern coverage edge.",
+      "point_sources": "Bright compact sources remain visible in images; mask or add model A-team response consistently.",
+      "errors": "Per-frequency HEALPix uncertainty products exist; snapshot-variation uncertainty does not replace global flux-scale systematic.",
+      "independence": "Direct LWA1 observations, but ULSA uses low-frequency survey inputs and this project uses ULSA global tuning; do not treat agreement of absolute levels as wholly independent.",
+      "sources": ["https://academic.oup.com/mnras/article/469/4/4537/3815529", "https://lambda.gsfc.nasa.gov/product/foreground/fg_lwa1_radio_maps_get.html"],
+      "data_url_pattern": "https://lambda.gsfc.nasa.gov/data/foregrounds/lwa1/healpix-all-sky-rav-wsclean-{map|err}-{frequency_mhz}.fits",
+      "example_direct_map_url": "https://lambda.gsfc.nasa.gov/data/foregrounds/lwa1/healpix-all-sky-rav-wsclean-map-45.fits",
+      "example_direct_error_url": "https://lambda.gsfc.nasa.gov/data/foregrounds/lwa1/healpix-all-sky-rav-wsclean-err-45.fits",
+      "license": "LAMBDA public download; explicit redistribution license not located."
+    },
+    {
+      "id": "haslam408_remazeilles",
+      "frequency_mhz": 408,
+      "coverage": "All sky",
+      "beam_fwhm_deg": "56 ± 1 arcmin effective",
+      "zero_level": "Product zero-level uncertainty should be treated as a fitted nuisance; a current authoritative numerical value for this exact version was not verified here.",
+      "point_sources": "Use source-subtracted/destriped product for diffuse tests; bright Galactic sources intentionally retained. The synthetic small-scale-added NSIDE-2048 variant is unsuitable as direct measured small-scale evidence.",
+      "errors": "No per-pixel uncertainty product on LAMBDA download page; original/processing systematics remain.",
+      "independence": "Observed 408-MHz map; lowsky does not import its pixels, but its emissivity normalization and loop contrasts use 408-MHz-based literature anchors, and 22-MHz survey scale also references Haslam.",
+      "sources": ["https://academic.oup.com/mnras/article/451/4/4311/1123361", "https://lambda.gsfc.nasa.gov/product/foreground/fg_2014_haslam_408_get.html"],
+      "direct_map_url": "https://lambda.gsfc.nasa.gov/data/foregrounds/haslam_2014/haslam408_dsds_Remazeilles2014.fits",
+      "direct_mask_url": "https://lambda.gsfc.nasa.gov/data/foregrounds/haslam_2014/haslam408_bitmask_Remazeilles2014.fits",
+      "license": "LAMBDA public download; explicit redistribution license not located."
+    }
+  ],
+  "published_measurements": [
+    {
+      "id": "roger_22_408_high_latitude_index",
+      "observable": "T proportional to frequency^-beta, 22 to 408 MHz",
+      "value": "Mean beta=2.47 away from plane; extended regional means 2.41 at synchrotron minimum to 2.54 near Loop III, rms about 0.03.",
+      "qualification": "Published source statement, not a new measurement; 22-MHz declination gain tied to Haslam and zero-level error affects exact beta.",
+      "source": "https://arxiv.org/html/astro-ph/9902213"
+    },
+    {
+      "id": "guzman_45_408_index",
+      "observable": "45-to-408-MHz temperature spectral-index morphology",
+      "value": "Index spans about 2.1-2.7 at 5-degree resolution; low-latitude values below 2.5 attributed to free-free absorption.",
+      "qualification": "Published survey-derived result; both endpoints enter sky-model lineages and 45-MHz calibration uncertainty remains.",
+      "source": "https://arxiv.org/abs/1011.4298"
+    },
+    {
+      "id": "laporta_408_1420_aps",
+      "observable": "Diffuse total-intensity C_ell power-law exponent after bright-source subtraction and latitude cuts",
+      "value": "alpha from -3.0 to -2.6, steepest at higher Galactic latitude; strong patch variation.",
+      "qualification": "408/1420-MHz result, not a direct low-frequency angular-spectrum measurement. Reproduce sky mask and ell interval before comparison.",
+      "source": "https://arxiv.org/abs/0801.0547"
+    },
+    {
+      "id": "remazeilles_haslam_aps",
+      "observable": "408-MHz angular-power exponent used for synthetic small-scale addition",
+      "value": "gamma=-2.703 fitted over ell=30-90 in original measured map.",
+      "qualification": "Only original measured map is evidence; the high-resolution small-scale-added map is a simulation.",
+      "source": "https://academic.oup.com/mnras/article/451/4/4311/1123361"
+    }
+  ]
+}

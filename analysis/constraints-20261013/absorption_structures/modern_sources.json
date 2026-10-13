@@ -1,0 +1,83 @@
+{
+  "as_of": "2026-10-13",
+  "sources": [
+    {
+      "id": "mckay_2026_ginan",
+      "paper": "McKay et al., Nature Astronomy 10, 1398-1410 (2026)",
+      "paper_url": "https://doi.org/10.1038/s41550-026-02888-5",
+      "preprint_url": "https://arxiv.org/abs/2509.11846",
+      "instrument": "GINAN self-calibrating radiometer and SKALA4.1 antenna on 40-m ground mesh at CSIRO Murchison Observatory",
+      "frequency_mhz": [60, 350],
+      "measured_product": "Calibrated antenna temperature in K versus frequency and LST, with RFI mask and frequency-dependent antenna beam patterns; not a sky map or pointwise brightness by itself",
+      "observation": "2024-10-23, approximately LST 20:00-04:00, southern sky; approximately 51% of celestial sphere has relative response >0.1",
+      "primary_data_doi": "https://doi.org/10.25919/8je1-fb10",
+      "primary_data_landing_url": "https://data.csiro.au/collection/csiro:73037v4",
+      "primary_data_collection_size": "7.87 GB (DataCite metadata); not downloaded",
+      "data_release_status": "verified public machine-readable release, no small primary spectrum downloaded in bounded pass",
+      "paper_model_correction": {
+        "target": "GSM2016 only",
+        "formula": "T_corrected = F_scale(f) * [T_GSM2016 - T_offset(f)]",
+        "x_definition": "x = log10(f_MHz/145)",
+        "t_offset_polynomial_k_ascending": [10.0086158, -9.03925211, 1523.27697, -7270.93946, -7492.34793, 68896.0788, 8619.02374, -198752.637],
+        "f_scale_polynomial_ascending": [1.19851, -0.108045, 1.65211, 2.86844, -4.04712, 7.41508],
+        "valid_frequency_mhz": [60, 350],
+        "provenance": "Published equations 1-2; derived model corrections, not independent per-frequency observations",
+        "uncertainty": "At 150 MHz: measurement rms 1.22%, corrected GSM2016 rms 1.81%; absolute measurement uncertainty <2% across 60-150 MHz, rising to <8% at 350 MHz (paper text)."
+      },
+      "rfi_exclusions_mhz": [[243.5, 270.4], [277.5, 285.0], [334, 342]],
+      "lowsky_relevance": "external absolute-calibration stress test above nominal 1-50 MHz range only; do not extrapolate published correction below 60 MHz"
+    },
+    {
+      "id": "monsalve_2021_edges_45_150",
+      "paper": "Monsalve et al., Absolute Calibration of Diffuse Radio Surveys at 45 and 150 MHz, ApJ (2021)",
+      "paper_url": "https://doi.org/10.3847/1538-4357/abd558",
+      "preprint_url": "https://arxiv.org/abs/2012.11019",
+      "instrument": "EDGES total-power Low/Mid/High Band radiometers; wide beam, LST drift scans at latitude -26.7 deg",
+      "product_type": "Fitted scale and zero-level corrections to existing maps, not public per-channel antenna spectrum in this source",
+      "corrections": [
+        {"map": "Guzman et al. 45-MHz survey", "frequency_mhz": 45, "scale_factor": 1.076, "scale_two_sigma": 0.034, "zero_level_k": -160, "zero_level_two_sigma_k": 78},
+        {"map": "Landecker-Wielebinski 150-MHz survey", "frequency_mhz": 150, "scale_factor": 1.112, "scale_two_sigma": 0.023, "zero_level_k": 0.7, "zero_level_two_sigma_k": 6.0}
+      ],
+      "lowsky_relevance": "45-MHz corrected map scale is directly in range; compare beam-convolved total brightness/zero level only after checking input-map lineage. A map correction is not 45-MHz independent pixel data."
+    },
+    {
+      "id": "bowman_2018_edges_reduced",
+      "paper_url": "https://doi.org/10.1038/nature25792",
+      "release_url": "https://loco.lab.asu.edu/edges/edges-data-release/",
+      "download_url": "https://loco.lab.asu.edu/download/790/",
+      "local_file": "sources/edges_bowman2018_fig1.csv",
+      "sha256": "6eebf9cd0a73280c002f630406e6692d7408e59f37bec1aef3664ceaac1cb030",
+      "product_type": "Reduced EDGES low-band Figure 1 sky-averaged antenna spectrum, Tsky in K plus fitted foreground/21-cm residual curves",
+      "frequency_mhz": [50, 100],
+      "frequency_spacing_mhz": 0.390625,
+      "row_count": 128,
+      "valid_weight_one_rows": 123,
+      "observation": "low-1 configuration H2, 2016 day 252 through 2017 day 94; beam-averaged southern sky",
+      "caveat": "Use Tsky and Weight columns as released, not fitted Tmodel/T21 as diffuse-sky measurements. Global-signal extraction is model-dependent and contested. Entire dataset is >=50 MHz, so no direct 1-50 MHz validation."
+    },
+    {
+      "id": "spinelli_2021_leda",
+      "publication_url": "https://academic.oup.com/mnras/article/505/2/1575/6276736",
+      "instrument": "LEDA radiometers at OVRO-LWA, northern sky",
+      "frequency_mhz": [50, 87],
+      "published_summary": "Combined beta -2.50 to -2.56 over LST 9-12.5 h, scatter/error 0.09-0.12",
+      "data_status": "No public machine-readable spectra identified; paper says underlying data shared on reasonable request, which was not made",
+      "calibration_lineage": "Absolute temperature scale explicitly corrected to match extrapolation of Guzman 45-MHz map; not independent absolute zero-level holdout",
+      "lowsky_relevance": "independent slope/beam comparison above 50 MHz, conditional on map-tied absolute scale"
+    },
+    {
+      "id": "patra_2015_saras",
+      "paper_url": "https://arxiv.org/abs/1412.7762",
+      "instrument": "SARAS correlation radiometer, 110-175 MHz",
+      "published_summary": "Absolute brightness systematic 1.2%; 150-MHz map recommended scale approximately 1.05 and offset subtraction 21.4 K; spectral index -2.3 to -2.45 over observed LST 23-01 h",
+      "data_status": "Paper summaries only; no numerical spectrum acquired in bounded pass",
+      "lowsky_relevance": "historical cross-instrument calibration above 1-50 MHz"
+    },
+    {
+      "id": "singal_2023_workshop",
+      "url": "https://arxiv.org/abs/2211.16547",
+      "classification": "Secondary workshop report, not a standalone EDGES measurement or numerical data release",
+      "action": "Do not count as an observational anchor; follow cited primary experiments instead."
+    }
+  ]
+}

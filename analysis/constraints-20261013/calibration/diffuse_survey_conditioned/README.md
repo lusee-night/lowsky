@@ -1,0 +1,15 @@
+# Empirical survey-conditioned diffuse realization
+
+This is a **separate survey-conditioned map product**, not a change to lowsky's physical emissivity, ionized screens, or background defaults. The original FITS remains untouched. Reproduce with `OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 .venv/bin/python examples/calibrate_diffuse_surveys.py --output-dir analysis/constraints-20261013/calibration/diffuse_survey_conditioned`.
+
+The final bounded fit uses 48 NSIDE=2 Gaussian sky centers (20° sigma), normalized to a positive partition of unity. A separate positive coefficient set at 10.03, 22, and southern 45 MHz multiplies the **saved volume synchrotron plus extragalactic** components. The same survey validity/source masks and 12° weighted low-ell smoothing operator enter the fit. Coefficients are constrained to [0.1, 2] and weakly regularized toward 1, with ridge 0.02/48 per coefficient. Local radio shells, free-free, and saved A-team are unchanged. The A-team is from the **saved historical realization**, not a newer Cas prescription. The full [1–50 MHz FITS](survey_conditioned_nside32_1_50mhz.fits) recomputes `BASELINE`, `NO_SOURCES`, and `PRIMARY` totals consistently; the inherited `EMISSCAL` and `BETADLT` header values still refer to the original physical baseline, **not** this empirical scale. [Anchor maps](anchor_scale_maps.npz) and [manifest](manifest.json) contain coefficients, masks, metrics, and input/output hashes.
+
+Training uses valid survey pixels at |b|>10°, with 8° A-team exclusions; southern 45-MHz pixels also require equatorial declination <−2°. Every third 30° Galactic-longitude sector is withheld for a spatial check. It shares each instrument's calibration and model ancestry, so it is **not an independent-survey validation**. No gain/zero-level nuisance is fit, and native anisotropic beams are only approximately matched by 12° smoothing. Between anchors, coefficients are interpolated in log frequency. The scale is frozen at its nearest anchor below 10.03 and above 45 MHz; those frequencies are **extrapolated**, not survey-validated.
+
+| Survey | Held-out RMS fractional residual, original → final | Held-out median model/survey − 1, final |
+|---|---:|---:|
+| 10.03 MHz | 1.084 → 0.109 | see manifest |
+| 22 MHz | 0.990 → 0.163 | see manifest |
+| Southern 45 MHz | 0.320 → 0.085 | see manifest |
+
+Regional median residuals from the final fit are anticenter north **+2.0% at 10.03 MHz** and **−5.5% at 22 MHz**, and Orion–Eridanus south **+1.2% at 22 MHz** and **−0.8% at 45 MHz**. These are conditioning regions, so their small residuals are *not* independent goodness-of-fit claims. The 10.03-, 22-, and 45-MHz fits have **19, 18, and 2 of 48 coefficients at bounds**, respectively; the broad empirical correction remains underconstrained by coverage/calibration. [Attempt 1](attempt1_summary.json), with 12 centers and 45° sigma, reduced held-out error but made the anticenter substantially too faint; it is retained only as an audit trail. No further complexity was added.

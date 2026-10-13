@@ -1,0 +1,212 @@
+{
+  "kind": "model_prediction_not_observation",
+  "source": "outputs_our_sky_gum_gaussian_final/counterfactual_ulsa_nside32_1_50mhz.fits",
+  "source_sha256": "c4839445df0e801e49f5a2d7c833232f6f445eda388d10e4b27e55bb180bae9c",
+  "status": "Existing September 2 artifact, not regenerated or refit in this gathering pass. Source commit at artifact creation is unverified.",
+  "observable": "Equal-area full-sky arithmetic mean of Galactic RING NSIDE32 total-temperature maps",
+  "beam_fwhm_deg": 2.0,
+  "independence": "ULSA-calibrated baseline; neither independent evidence nor an uncertainty ensemble.",
+  "comparison_requirement": "Only directly overlay observations with compatible sky/beam/time/source weighting, or forward-model their measurement operator first.",
+  "records": [
+    {
+      "frequency_mhz": 1.0,
+      "all_sky_mean_temperature_k": 138290438.28857422
+    },
+    {
+      "frequency_mhz": 2.0,
+      "all_sky_mean_temperature_k": 29090759.44592285
+    },
+    {
+      "frequency_mhz": 3.0,
+      "all_sky_mean_temperature_k": 10854609.036234537
+    },
+    {
+      "frequency_mhz": 4.0,
+      "all_sky_mean_temperature_k": 5282713.917989095
+    },
+    {
+      "frequency_mhz": 5.0,
+      "all_sky_mean_temperature_k": 3003477.650655111
+    },
+    {
+      "frequency_mhz": 6.0,
+      "all_sky_mean_temperature_k": 1889018.3583984375
+    },
+    {
+      "frequency_mhz": 7.0,
+      "all_sky_mean_temperature_k": 1274648.0207417805
+    },
+    {
+      "frequency_mhz": 8.0,
+      "all_sky_mean_temperature_k": 905705.6927668253
+    },
+    {
+      "frequency_mhz": 9.0,
+      "all_sky_mean_temperature_k": 669529.7822418213
+    },
+    {
+      "frequency_mhz": 10.0,
+      "all_sky_mean_temperature_k": 510674.0893465678
+    },
+    {
+      "frequency_mhz": 11.0,
+      "all_sky_mean_temperature_k": 399523.7583096822
+    },
+    {
+      "frequency_mhz": 12.0,
+      "all_sky_mean_temperature_k": 319204.2392234802
+    },
+    {
+      "frequency_mhz": 13.0,
+      "all_sky_mean_temperature_k": 259583.832291921
+    },
+    {
+      "frequency_mhz": 14.0,
+      "all_sky_mean_temperature_k": 214310.67059898376
+    },
+    {
+      "frequency_mhz": 15.0,
+      "all_sky_mean_temperature_k": 179255.31108029684
+    },
+    {
+      "frequency_mhz": 16.0,
+      "all_sky_mean_temperature_k": 151648.7011458079
+    },
+    {
+      "frequency_mhz": 17.0,
+      "all_sky_mean_temperature_k": 129583.68141174316
+    },
+    {
+      "frequency_mhz": 18.0,
+      "all_sky_mean_temperature_k": 111715.68189589183
+    },
+    {
+      "frequency_mhz": 19.0,
+      "all_sky_mean_temperature_k": 97077.05947907765
+    },
+    {
+      "frequency_mhz": 20.0,
+      "all_sky_mean_temperature_k": 84958.5908203125
+    },
+    {
+      "frequency_mhz": 21.0,
+      "all_sky_mean_temperature_k": 74831.89240296681
+    },
+    {
+      "frequency_mhz": 22.0,
+      "all_sky_mean_temperature_k": 66297.47631835938
+    },
+    {
+      "frequency_mhz": 23.0,
+      "all_sky_mean_temperature_k": 59049.260281562805
+    },
+    {
+      "frequency_mhz": 24.0,
+      "all_sky_mean_temperature_k": 52849.872854709625
+    },
+    {
+      "frequency_mhz": 25.0,
+      "all_sky_mean_temperature_k": 47513.18318287531
+    },
+    {
+      "frequency_mhz": 26.0,
+      "all_sky_mean_temperature_k": 42891.75365972519
+    },
+    {
+      "frequency_mhz": 27.0,
+      "all_sky_mean_temperature_k": 38867.70264720917
+    },
+    {
+      "frequency_mhz": 28.0,
+      "all_sky_mean_temperature_k": 35345.96498409907
+    },
+    {
+      "frequency_mhz": 29.0,
+      "all_sky_mean_temperature_k": 32249.262847741444
+    },
+    {
+      "frequency_mhz": 30.0,
+      "all_sky_mean_temperature_k": 29514.311190605164
+    },
+    {
+      "frequency_mhz": 31.0,
+      "all_sky_mean_temperature_k": 27088.926164627075
+    },
+    {
+      "frequency_mhz": 32.0,
+      "all_sky_mean_temperature_k": 24929.800589164097
+    },
+    {
+      "frequency_mhz": 33.0,
+      "all_sky_mean_temperature_k": 23000.77741265297
+    },
+    {
+      "frequency_mhz": 34.0,
+      "all_sky_mean_temperature_k": 21271.498937129974
+    },
+    {
+      "frequency_mhz": 35.0,
+      "all_sky_mean_temperature_k": 19716.34150536855
+    },
+    {
+      "frequency_mhz": 36.0,
+      "all_sky_mean_temperature_k": 18313.56945212682
+    },
+    {
+      "frequency_mhz": 37.0,
+      "all_sky_mean_temperature_k": 17044.65857664744
+    },
+    {
+      "frequency_mhz": 38.0,
+      "all_sky_mean_temperature_k": 15893.751645247141
+    },
+    {
+      "frequency_mhz": 39.0,
+      "all_sky_mean_temperature_k": 14847.217461148897
+    },
+    {
+      "frequency_mhz": 40.0,
+      "all_sky_mean_temperature_k": 13893.291902422905
+    },
+    {
+      "frequency_mhz": 41.0,
+      "all_sky_mean_temperature_k": 13021.783891280493
+    },
+    {
+      "frequency_mhz": 42.0,
+      "all_sky_mean_temperature_k": 12223.833548227945
+    },
+    {
+      "frequency_mhz": 43.0,
+      "all_sky_mean_temperature_k": 11491.712043364843
+    },
+    {
+      "frequency_mhz": 44.0,
+      "all_sky_mean_temperature_k": 10818.655424674353
+    },
+    {
+      "frequency_mhz": 45.0,
+      "all_sky_mean_temperature_k": 10198.725849628448
+    },
+    {
+      "frequency_mhz": 46.0,
+      "all_sky_mean_temperature_k": 9626.695364753405
+    },
+    {
+      "frequency_mhz": 47.0,
+      "all_sky_mean_temperature_k": 9097.948048909506
+    },
+    {
+      "frequency_mhz": 48.0,
+      "all_sky_mean_temperature_k": 8608.397400697073
+    },
+    {
+      "frequency_mhz": 49.0,
+      "all_sky_mean_temperature_k": 8154.416277607282
+    },
+    {
+      "frequency_mhz": 50.0,
+      "all_sky_mean_temperature_k": 7732.777359565099
+    }
+  ]
+}

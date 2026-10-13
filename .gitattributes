@@ -1,0 +1,5 @@
+# Preserve published numerical tables byte-for-byte for provenance hashes.
+analysis/**/sources/* -text -whitespace
+
+# Matplotlib emits harmless trailing spaces inside SVG path data.
+analysis/**/*.svg -whitespace

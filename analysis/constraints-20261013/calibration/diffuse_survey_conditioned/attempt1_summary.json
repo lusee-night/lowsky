@@ -1,0 +1,43 @@
+{
+  "basis": "12 NSIDE=1 centers sigma45deg",
+  "output_fits_sha256": "2c193b60a974c2081306c04ae34c2d9cfdffa57327c28d376f7a806b99c66da8",
+  "results": {
+    "10.03": {
+      "held_out_before_rms": 1.0841634390943278,
+      "held_out_after_rms": 0.2301792870419898,
+      "regions": {
+        "anticenter_north": {
+          "before_median": 0.44877723523105556,
+          "after_median": -0.33117881171309954
+        }
+      },
+      "bounds_active": 1
+    },
+    "22": {
+      "held_out_before_rms": 0.9897781012118395,
+      "held_out_after_rms": 0.3002290049908044,
+      "regions": {
+        "anticenter_north": {
+          "before_median": 0.39192825413909077,
+          "after_median": -0.3916556155263706
+        },
+        "orion_south": {
+          "before_median": 1.065620610535899,
+          "after_median": 0.08932059074862579
+        }
+      },
+      "bounds_active": 1
+    },
+    "45south": {
+      "held_out_before_rms": 0.32048097323535846,
+      "held_out_after_rms": 0.12971163147008782,
+      "regions": {
+        "orion_south": {
+          "before_median": 0.6100190836387839,
+          "after_median": 0.08483770277699024
+        }
+      },
+      "bounds_active": 0
+    }
+  }
+}

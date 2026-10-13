@@ -1,0 +1,9 @@
+# Evidence comparisons — existing lowsky baseline
+
+Reproduce with `python examples/compare_evidence.py` from the project environment. See [the comparison guide](../../../docs/evidence_comparisons.md) for measurement operators, domains and prerequisites. All panels use `outputs_our_sky_gum_gaussian_final/`; no parameters were refitted.
+
+- [Source ratios](bright_sources/lwa1_source_ratios.png) ([PDF](bright_sources/lwa1_source_ratios.pdf)): measured LWA1 ratios vs integrated source-only predictions; 12 strictly in-range points and three nominal-50-MHz approximations. Broad visual agreement has shared-calibration and response caveats.
+- [Cas A turnover](bright_sources/cas_a_turnover.png) ([PDF](bright_sources/cas_a_turnover.pdf)): the model spectrum peaks near 10 MHz on the saved integer-frequency grid, versus fitted observed peaks near 22 MHz. At the observed peak frequencies it predicts approximately 49–50 kJy versus reported 30–32 kJy. Epoch/response matching is incomplete; this is a diagnostic discrepancy.
+- [Regional diffuse profiles](radio_regions/radio_regions.png) ([SVG](radio_regions/radio_regions.svg)): identical masks and additional coarse convolution on survey and model, with approximate native-beam matching. Median `(survey-model)/model` is −31%/−28% for the north anticentre footprint at 10.03/22 MHz, and −54%/−36% for the southern Orion footprint at 22/45 MHz. Shaded spreads show spatial variation, not measurement error or uncertainty on the median.
+
+These plots identify potential agreement and disagreement in supported comparison domains; they do not certify a region of correctness. Raw calibration uncertainty, shared input lineage, approximate response matching and the unverified generating revision of the saved baseline limit conclusions. JSON files beside each figure preserve plotted quantities and input checksums. The full evidence index retains unplotted datasets with explicit reasons rather than silently discarding them.

@@ -1,0 +1,65 @@
+{
+  "peak_checks": [
+    {
+      "epoch": "2023.5",
+      "frequency_mhz": 21.5,
+      "observed_peak_jy": 29880,
+      "before_jy_at_frequency": 48765.97616289626,
+      "after_jy_at_frequency": 29880.000000000004
+    },
+    {
+      "epoch": "2019",
+      "frequency_mhz": 22.345,
+      "observed_peak_jy": 32190,
+      "before_jy_at_frequency": 47614.49169004663,
+      "after_jy_at_frequency": 29845.069330954197
+    }
+  ],
+  "lwa1_ratio_checks": [
+    {
+      "actual_center_mhz": 34.979,
+      "compared_frequency_mhz": 34.979,
+      "observed_ratio": 1.29,
+      "reported_pm": 0.57,
+      "before_ratio": 1.3003718602224854,
+      "after_ratio": 0.9606788563386215
+    },
+    {
+      "actual_center_mhz": 38.042,
+      "compared_frequency_mhz": 38.042,
+      "observed_ratio": 1.26,
+      "reported_pm": 0.43,
+      "before_ratio": 1.289938138912109,
+      "after_ratio": 0.9693061550989555
+    },
+    {
+      "actual_center_mhz": 40.052,
+      "compared_frequency_mhz": 40.052,
+      "observed_ratio": 1.19,
+      "reported_pm": 0.38,
+      "before_ratio": 1.28451427828011,
+      "after_ratio": 0.9739916369492306
+    },
+    {
+      "actual_center_mhz": 44.933,
+      "compared_frequency_mhz": 44.933,
+      "observed_ratio": 1.16,
+      "reported_pm": 0.3,
+      "before_ratio": 1.274619827643534,
+      "after_ratio": 0.9830373698240411
+    },
+    {
+      "actual_center_mhz": 50.005,
+      "compared_frequency_mhz": 50.0,
+      "observed_ratio": 1.13,
+      "reported_pm": 0.24,
+      "before_ratio": 1.2676898639328835,
+      "after_ratio": 0.9899834046358481
+    }
+  ],
+  "model_fifty_mhz_jy": {
+    "before": 27084.260856602486,
+    "after": 21151.047695277888
+  },
+  "note": "2023.5 peak is fitted calibration; all other points are contextual diagnostics, with epoch/measurement-operator mismatch"
+}

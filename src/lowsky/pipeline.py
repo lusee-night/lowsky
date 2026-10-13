@@ -115,7 +115,10 @@ class PreparedSky:
 ATEAM = {
     # Galactic (l,b), S_50MHz [Jy], flux spectral index, distance [kpc or inf],
     # phenomenological internal turnover optical depth at 10 MHz.
-    "CAS_A": (111.7376, -2.1345, 27_104.0, -0.77, 3.4, 0.35),
+    # 2023.5 NenuFAR/URAN-2 fitted integrated peak: 29,880 Jy at 21.5 MHz.
+    # Conditional two-parameter calibration at fixed alpha and modeled MW EM;
+    # see analysis/constraints-20261013/calibration/cas_a/fit.json.
+    "CAS_A": (111.7376, -2.1345, 21_166.462683550057, -0.77, 3.4, 1.808357948129924),
     "CYG_A": (76.1899, 5.7554, 22_146.0, -0.78, np.inf, 0.08),
     "TAU_A": (184.5547, -5.7833, 2_008.0, -0.27, 2.0, 0.12),
     "VIR_A": (283.7778, 74.4912, 2_635.0, -0.85, np.inf, 0.04),

@@ -1,0 +1,72 @@
+{
+  "title": "Tau A and Vir A ratios to Cyg A, observed versus lowsky",
+  "source": "https://academic.oup.com/mnras/article/469/4/4537/3815529",
+  "measurements_path": "analysis/constraints-20261013/objects_bright_sources/measurements.json",
+  "artifact_path": "outputs_our_sky_gum_gaussian_final/ateam_components.npz",
+  "artifact_sha256": "55e4abd3e7945058ba5f3fdc299a038cd1dfaf2d952996e438ba7af65aa788bf",
+  "model_status": "saved baseline; Tau A, Vir A and Cyg A source parameters unchanged by the Cas A update",
+  "measurement_operator": "LWA1 beam/annulus/Gaussian flux ratio; displayed lowsky line is integrated source-only ratio",
+  "nominal_50_mhz_note": "Measured band center is 50.005 MHz; compared visually with 50 MHz model endpoint",
+  "records": [
+    {
+      "object": "TAU_A",
+      "frequency_mhz_center": 34.979,
+      "ratio_to_cyg_a": 0.11,
+      "reported_pm": 0.02
+    },
+    {
+      "object": "TAU_A",
+      "frequency_mhz_center": 38.042,
+      "ratio_to_cyg_a": 0.1,
+      "reported_pm": 0.02
+    },
+    {
+      "object": "TAU_A",
+      "frequency_mhz_center": 40.052,
+      "ratio_to_cyg_a": 0.1,
+      "reported_pm": 0.02
+    },
+    {
+      "object": "TAU_A",
+      "frequency_mhz_center": 44.933,
+      "ratio_to_cyg_a": 0.1,
+      "reported_pm": 0.02
+    },
+    {
+      "object": "TAU_A",
+      "frequency_mhz_center": 50.005,
+      "ratio_to_cyg_a": 0.1,
+      "reported_pm": 0.02
+    },
+    {
+      "object": "VIR_A",
+      "frequency_mhz_center": 34.979,
+      "ratio_to_cyg_a": 0.15,
+      "reported_pm": 0.05
+    },
+    {
+      "object": "VIR_A",
+      "frequency_mhz_center": 38.042,
+      "ratio_to_cyg_a": 0.15,
+      "reported_pm": 0.04
+    },
+    {
+      "object": "VIR_A",
+      "frequency_mhz_center": 40.052,
+      "ratio_to_cyg_a": 0.14,
+      "reported_pm": 0.03
+    },
+    {
+      "object": "VIR_A",
+      "frequency_mhz_center": 44.933,
+      "ratio_to_cyg_a": 0.14,
+      "reported_pm": 0.03
+    },
+    {
+      "object": "VIR_A",
+      "frequency_mhz_center": 50.005,
+      "ratio_to_cyg_a": 0.13,
+      "reported_pm": 0.02
+    }
+  ]
+}

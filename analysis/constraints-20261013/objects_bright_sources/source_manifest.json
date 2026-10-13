@@ -1,0 +1,58 @@
+{
+  "sources": [
+    {
+      "id": "ateam_lofar_2020",
+      "url": "https://arxiv.org/html/2002.10431",
+      "local_path": "source_html/ateam_lofar_2020.html",
+      "bytes": 141835,
+      "sha256": "21334e4e414bd14bd653fb8b17f0fcab8ddcc168ce3c01340d1e32b635c4bdc1",
+      "retrieved_utc": "2026-10-13",
+      "format": "original publisher-hosted arXiv HTML",
+      "license": "arXiv access; reuse governed by article license; local research copy"
+    },
+    {
+      "id": "cas_nenufar_2024",
+      "url": "https://arxiv.org/html/2312.09764",
+      "local_path": "source_html/cas_nenufar_2024.html",
+      "bytes": 178270,
+      "sha256": "48b176fcaa5cb3b9dd9418c7fe8f4b5bb206cdfff56ceb209fcf9042beb0c4e1",
+      "retrieved_utc": "2026-10-13",
+      "format": "original publisher-hosted arXiv HTML",
+      "license": "arXiv access; reuse governed by article license; local research copy"
+    },
+    {
+      "id": "vir_lofar_2012",
+      "url": "https://arxiv.org/html/1210.1346",
+      "local_path": "source_html/vir_lofar_2012.html",
+      "bytes": 443000,
+      "sha256": "339aefac9fdf3cc9e5c011e7354b53cf1034bb8250f6b310ec92e9937ff7523f",
+      "retrieved_utc": "2026-10-13",
+      "format": "original publisher-hosted arXiv HTML",
+      "license": "arXiv access; reuse governed by article license; local research copy"
+    },
+    {
+      "id": "cas_gurt_2019",
+      "url": "https://arxiv.org/html/2212.06104",
+      "local_path": "source_html/cas_gurt_2019_published_2023.html",
+      "bytes": 189033,
+      "sha256": "608d9545c64cdfa6e5ef6bb513947144000c1269c1a2df2c5bee51a445b1d076",
+      "retrieved_utc": "2026-10-13",
+      "format": "original author-hosted arXiv HTML",
+      "license": "arXiv access; reuse governed by article license; local research copy"
+    }
+  ],
+  "additional_primary_pages": [
+    {
+      "id": "lwa1_llfss_2017",
+      "url": "https://academic.oup.com/mnras/article/469/4/4537/3815529",
+      "local_copy": false,
+      "reason": "publisher blocked direct command-line fetch; Table 2 transcribed from publisher-rendered page and checked twice"
+    },
+    {
+      "id": "crab_nenufar_2025",
+      "url": "https://doi.org/10.3847/1538-4357/ae10a5",
+      "local_copy": false,
+      "reason": "publisher anti-bot page; abstract-level result only, no numerical table acquired"
+    }
+  ]
+}

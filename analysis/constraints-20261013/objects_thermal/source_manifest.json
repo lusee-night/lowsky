@@ -1,0 +1,115 @@
+{
+  "as_of": "2026-10-13",
+  "files": [
+    {
+      "path": "sources/woermann2000_gum.pdf",
+      "url": "https://adsabs.harvard.edu/pdf/2000MNRAS.315..241W",
+      "bytes": 263930,
+      "sha256": "6a49d32127bf6840fde4d59e73ba64a7a365f0a96b1b92038550f8ce76373137",
+      "role": "primary paper or catalog metadata"
+    },
+    {
+      "path": "sources/wham2006_orion.pdf",
+      "url": "https://arxiv.org/pdf/astro-ph/0609558",
+      "bytes": 667655,
+      "sha256": "d4223739ad8a9606e9e009fb230c557ab9d526bbbf2f86e39948a835f0705f10",
+      "role": "primary paper or catalog metadata"
+    },
+    {
+      "path": "sources/kumar2026_gum.pdf",
+      "url": "https://arxiv.org/pdf/2601.05791",
+      "bytes": 754144,
+      "sha256": "888aac09e134cbc1146787cd88ae77e490914ea47a370baf2cf424d1e5da366f",
+      "role": "primary paper or catalog metadata"
+    },
+    {
+      "path": "sources/emig2022_cds_ReadMe",
+      "url": "https://cdsarc.cds.unistra.fr/ftp/J/A+A/664/A88/ReadMe",
+      "bytes": 6687,
+      "sha256": "3598f505b3495cc11d2c82199d1c25a7d22b253007888fe3333acd09a0afd3fe",
+      "role": "primary paper or catalog metadata"
+    },
+    {
+      "path": "sources/emig2022_list.dat",
+      "url": "https://cdsarc.cds.unistra.fr/ftp/J/A+A/664/A88/list.dat",
+      "bytes": 151,
+      "sha256": "6ce01342874d23e607cc5b1d865d3a46a02ea0fcbdbd1ce26748db9adea0fdf5",
+      "role": "public data product"
+    },
+    {
+      "path": "sources/CygX_LOFAR_148MHz_SScor_Emig2022.fits",
+      "url": "https://cdsarc.cds.unistra.fr/ftp/J/A+A/664/A88/fits/CygX_LOFAR_148MHz_SScor_Emig2022.fits",
+      "bytes": 2583360,
+      "sha256": "f707cc44b90c5868766aa5b979c7cea86213aa51ea5ae65c7661b72469468989",
+      "role": "public data product"
+    }
+  ],
+  "references": [
+    {
+      "id": "madsen2006_table3",
+      "title": "A Multiwavelength Optical Emission Line Survey of Warm Ionized Gas in the Galaxy",
+      "url": "https://arxiv.org/abs/astro-ph/0609558",
+      "local_file": "sources/wham2006_orion.pdf",
+      "numeric_location": "Table 3"
+    },
+    {
+      "id": "woermann2000_table1",
+      "title": "Radio recombination lines from the Gum Nebula",
+      "url": "https://doi.org/10.1046/j.1365-8711.2000.03344.x",
+      "local_file": "sources/woermann2000_gum.pdf",
+      "numeric_location": "Table 1"
+    },
+    {
+      "id": "woermann2000_table2",
+      "title": "Radio recombination lines from the Gum Nebula",
+      "url": "https://doi.org/10.1046/j.1365-8711.2000.03344.x",
+      "local_file": "sources/woermann2000_gum.pdf",
+      "numeric_location": "Table 2"
+    },
+    {
+      "id": "kumar2026_abstract",
+      "title": "Probing the morphology of the Gum Nebula through pulsar observables and a novel distance estimation method",
+      "url": "https://arxiv.org/abs/2601.05791",
+      "local_file": "sources/kumar2026_gum.pdf",
+      "numeric_location": "abstract"
+    },
+    {
+      "id": "kumar2026_table2",
+      "title": "Probing the morphology of the Gum Nebula through pulsar observables and a novel distance estimation method",
+      "url": "https://arxiv.org/abs/2601.05791",
+      "local_file": "sources/kumar2026_gum.pdf",
+      "numeric_location": "Table 2"
+    },
+    {
+      "id": "emig2022_abstract",
+      "title": "Filamentary structures of ionized gas in Cygnus X",
+      "url": "https://arxiv.org/abs/2205.09193",
+      "numeric_location": "abstract; source paper not downloaded (22 MB)"
+    },
+    {
+      "id": "emig2022_table1",
+      "title": "Filamentary structures of ionized gas in Cygnus X",
+      "url": "https://arxiv.org/html/2205.09193",
+      "numeric_location": "Table 1; five published rows verified in HTML"
+    },
+    {
+      "id": "emig2022_CDS",
+      "title": "CDS J/A+A/664/A88 LOFAR short-spacing-corrected image",
+      "url": "https://cdsarc.cds.unistra.fr/viz-bin/ReadMe/J/A+A/664/A88?format=html&tex=true",
+      "local_file": "sources/CygX_LOFAR_148MHz_SScor_Emig2022.fits",
+      "numeric_location": "FITS image"
+    },
+    {
+      "id": "roshi2025_abstract",
+      "title": "Detection of Helium Recombination Lines in the Cygnus X Diffuse Ionized Gas",
+      "url": "https://doi.org/10.3847/1538-3881/adfdd9",
+      "numeric_location": "abstract; publisher full text retrieval unresolved, article mirror inspected"
+    },
+    {
+      "id": "emig2022_section5_3_1",
+      "title": "Filamentary structures of ionized gas in Cygnus X",
+      "url": "https://arxiv.org/html/2205.09193",
+      "numeric_location": "Section 5.3.1"
+    }
+  ]
+}

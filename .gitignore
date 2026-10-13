@@ -19,3 +19,14 @@ references/*.pdf
 references/*.txt
 references/*.tar
 references/arxiv_source/
+
+# Research downloads: retain extracted records and acquisition manifests.
+analysis/**/source_html/
+analysis/**/sources/*.pdf
+analysis/**/sources/*.txt
+!analysis/**/sources/PSP_FIELDS_RFS_b2m.txt
+
+# Presentation bundles and redundant generated PDF exports.
+analysis/**/*.zip
+analysis/**/calibration/**/*.pdf
+analysis/**/comparisons/**/*.pdf
